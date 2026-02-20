@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import type { MealCandidate, Product, Meal } from '../models/types';
 import { TierBadge } from './StatusBadge';
+import { getLocalISODate } from '../logic/dateUtils';
 
 interface Props {
   candidates: MealCandidate[];
@@ -32,7 +33,7 @@ export function MealSuggestionModal({ candidates, products, onAccept, onClose }:
   }
 
   const candidate = candidates[selected];
-  const today = new Date().toISOString().slice(0, 10);
+  const today = getLocalISODate();
 
   function handleAccept() {
     onAccept({

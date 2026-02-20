@@ -3,10 +3,9 @@ interface MacroBarProps {
   current: number;
   target: number;
   unit: string;
-  color: string;
 }
 
-export function MacroBar({ label, current, target, unit, color }: MacroBarProps) {
+export function MacroBar({ label, current, target, unit }: MacroBarProps) {
   const pct = target > 0 ? Math.min((current / target) * 100, 100) : 0;
   const remaining = Math.max(0, target - current);
   const isOver = current > target;
@@ -23,7 +22,7 @@ export function MacroBar({ label, current, target, unit, color }: MacroBarProps)
       </div>
       <div className="w-full bg-gray-200 rounded-full h-3">
         <div
-          className={`h-3 rounded-full transition-all duration-300 ${isOver ? 'bg-red-500' : color}`}
+          className={`h-3 rounded-full transition-all duration-300 ${isOver ? 'bg-emerald-700' : 'bg-emerald-500'}`}
           style={{ width: `${pct}%` }}
         />
       </div>

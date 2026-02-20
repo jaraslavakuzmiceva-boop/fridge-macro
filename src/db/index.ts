@@ -20,6 +20,10 @@ class FridgeMacroDB extends Dexie {
 
 export const db = new FridgeMacroDB();
 
+export async function purgeMealsNotOnDate(date: string): Promise<void> {
+  await db.meals.where('date').notEqual(date).delete();
+}
+
 export async function ensureDefaultSettings(): Promise<Settings> {
   const count = await db.settings.count();
   if (count === 0) {

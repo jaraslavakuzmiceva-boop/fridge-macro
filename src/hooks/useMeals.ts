@@ -1,9 +1,10 @@
 import { useLiveQuery } from 'dexie-react-hooks';
 import { db } from '../db';
+import { getLocalISODate } from '../logic/dateUtils';
 import type { Meal } from '../models/types';
 
 export function useMeals() {
-  const today = new Date().toISOString().slice(0, 10);
+  const today = getLocalISODate();
 
   const todayMeals = useLiveQuery(
     () => db.meals.where('date').equals(today).toArray(),

@@ -1,6 +1,7 @@
 import type { Product, InventoryItem, MealItem, MealCandidate, MealTier, Settings, ForecastStatus, ShoppingSuggestion } from '../models/types';
 import { calcMealMacros, getIdealMealMacros, getWeightInGrams, type MacroTotals } from './macroCalculator';
 import { isExpired, isD0OrExpired } from './expirationUtils';
+import { countEggsInItems, EGG_MAX_PER_DAY, getEggProductId } from './eggRules';
 
 function scoreMeal(meal: MacroTotals, ideal: MacroTotals): { score: number; tier: MealTier } {
   if (ideal.kcal === 0) return { score: 1000, tier: 'red' };
@@ -75,7 +76,8 @@ export function generateMealCandidates(
   products: Map<number, Product>,
   remaining: MacroTotals,
   mealsLeft: number,
-  maxCandidates: number = 3
+  maxCandidates: number = 3,
+  constraints?: { eggProductId?: number | null; eggsRemaining?: number }
 ): MealCandidate[] {
   const ideal = getIdealMealMacros(remaining, mealsLeft);
   const available = getAvailableProducts(inventory, products, true, false);
@@ -106,7 +108,14 @@ export function generateMealCandidates(
   // Sort by score ascending (lower is better)
   candidates.sort((a, b) => a.score - b.score);
 
-  return candidates.slice(0, maxCandidates);
+  let filtered = candidates;
+  if (constraints?.eggProductId && typeof constraints.eggsRemaining === 'number') {
+    filtered = candidates.filter(c =>
+      countEggsInItems(c.items, products, constraints.eggProductId!) <= constraints.eggsRemaining!
+    );
+  }
+
+  return filtered.slice(0, maxCandidates);
 }
 
 function generateFromItems(
@@ -181,19 +190,30 @@ export function generateForecast(
   const meals: MealCandidate[] = [];
   let remaining = { ...fullDayMacros };
   let mealsLeft = settings.mealsPerDay;
+  const eggProductId = getEggProductId(products);
+  let eggsRemaining = eggProductId ? EGG_MAX_PER_DAY : undefined;
 
   for (let i = 0; i < 3; i++) {
     const candidates = generateMealCandidates(
       tomorrowInventory,
       products,
       remaining,
-      mealsLeft
+      mealsLeft,
+      3,
+      { eggProductId, eggsRemaining }
     );
 
     if (candidates.length === 0) break;
 
     const best = candidates[0];
     meals.push(best);
+
+    if (eggProductId && typeof eggsRemaining === 'number') {
+      eggsRemaining = Math.max(
+        0,
+        eggsRemaining - countEggsInItems(best.items, products, eggProductId)
+      );
+    }
 
     remaining = {
       kcal: Math.max(0, remaining.kcal - best.totalKcal),

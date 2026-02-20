@@ -9,6 +9,7 @@ import { MealCard } from '../components/MealCard';
 import { MealSuggestionModal } from '../components/MealSuggestionModal';
 import { getRemainingMacros, type MacroTotals } from '../logic/macroCalculator';
 import { generateMealCandidates } from '../logic/mealGenerator';
+import { countEggsInItems, EGG_MAX_PER_DAY, getEggProductId } from '../logic/eggRules';
 import type { Product, Meal } from '../models/types';
 
 export function TodayScreen() {
@@ -23,6 +24,17 @@ export function TodayScreen() {
     for (const p of allProducts) map.set(p.id!, p);
     return map;
   }, [allProducts]);
+
+  const eggProductId = useMemo(() => getEggProductId(productMap), [productMap]);
+  const eggsConsumedToday = useMemo(() => {
+    if (!eggProductId) return 0;
+    let total = 0;
+    for (const meal of todayMeals) {
+      total += countEggsInItems(meal.items, productMap, eggProductId);
+    }
+    return total;
+  }, [todayMeals, productMap, eggProductId]);
+  const eggsRemaining = eggProductId ? Math.max(0, EGG_MAX_PER_DAY - eggsConsumedToday) : undefined;
 
   const consumed = useMemo<MacroTotals>(() => {
     const totals: MacroTotals = { kcal: 0, protein: 0, fat: 0, carbs: 0, simpleCarbs: 0 };
@@ -41,8 +53,15 @@ export function TodayScreen() {
 
   const candidates = useMemo(() => {
     if (!remaining || !settings) return [];
-    return generateMealCandidates(inventory, productMap, remaining, mealsLeft);
-  }, [inventory, productMap, remaining, mealsLeft, settings]);
+    return generateMealCandidates(
+      inventory,
+      productMap,
+      remaining,
+      mealsLeft,
+      3,
+      { eggProductId, eggsRemaining }
+    );
+  }, [inventory, productMap, remaining, mealsLeft, settings, eggProductId, eggsRemaining]);
 
   async function handleAcceptMeal(meal: Omit<Meal, 'id' | 'createdAt'>) {
     await logMeal(meal);
@@ -61,10 +80,10 @@ export function TodayScreen() {
       <h1 className="text-xl font-bold text-gray-800 mb-4">Today</h1>
 
       <div className="bg-white rounded-xl p-4 shadow-sm border border-gray-100 mb-4">
-        <MacroBar label="Calories" current={consumed.kcal} target={settings.dailyKcal} unit="kcal" color="bg-blue-500" />
-        <MacroBar label="Protein" current={consumed.protein} target={settings.dailyProtein} unit="g" color="bg-red-400" />
-        <MacroBar label="Fat" current={consumed.fat} target={settings.dailyFat} unit="g" color="bg-yellow-400" />
-        <MacroBar label="Carbs" current={consumed.carbs} target={settings.dailyCarbs} unit="g" color="bg-green-500" />
+        <MacroBar label="Calories" current={consumed.kcal} target={settings.dailyKcal} unit="kcal" />
+        <MacroBar label="Protein" current={consumed.protein} target={settings.dailyProtein} unit="g" />
+        <MacroBar label="Fat" current={consumed.fat} target={settings.dailyFat} unit="g" />
+        <MacroBar label="Carbs" current={consumed.carbs} target={settings.dailyCarbs} unit="g" />
 
         <div className="mt-2 flex items-center gap-2">
           <span className="text-xs text-gray-500">Simple carbs:</span>
