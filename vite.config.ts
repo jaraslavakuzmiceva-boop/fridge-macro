@@ -4,6 +4,7 @@ import tailwindcss from '@tailwindcss/vite'
 import { VitePWA } from 'vite-plugin-pwa'
 
 export default defineConfig({
+  base: '/fridge-macro/',
   plugins: [
     react(),
     tailwindcss(),
@@ -18,8 +19,8 @@ export default defineConfig({
         background_color: '#f9fafb',
         display: 'standalone',
         icons: [
-          { src: '/icons/I_FridgeMacros_192.png', sizes: '192x192', type: 'image/png' },
-          { src: '/icons/I_FridgeMacros_512.png', sizes: '512x512', type: 'image/png' },
+          { src: 'icons/I_FridgeMacros_192.png', sizes: '192x192', type: 'image/png' },
+          { src: 'icons/I_FridgeMacros_512.png', sizes: '512x512', type: 'image/png' },
         ],
       },
     }),
