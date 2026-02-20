@@ -64,8 +64,8 @@ export function TodayScreen() {
   }, [inventory, productMap, remaining, mealsLeft, settings, eggProductId, eggsRemaining]);
 
   async function handleAcceptMeal(meal: Omit<Meal, 'id' | 'createdAt'>) {
-    await logMeal(meal);
-    await deductItems(meal.items.map(i => ({ productId: i.productId, quantity: i.quantity, unit: i.unit })));
+    const sources = await deductItems(meal.items.map(i => ({ productId: i.productId, quantity: i.quantity, unit: i.unit })));
+    await logMeal({ ...meal, sources });
     setShowSuggestions(false);
   }
 

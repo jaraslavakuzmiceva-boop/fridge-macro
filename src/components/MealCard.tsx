@@ -3,7 +3,7 @@ import type { Meal, Product } from '../models/types';
 interface Props {
   meal: Meal;
   products: Map<number, Product>;
-  onDelete?: (id: number) => void;
+  onDelete?: (meal: Meal) => void;
 }
 
 export function MealCard({ meal, products, onDelete }: Props) {
@@ -15,7 +15,7 @@ export function MealCard({ meal, products, onDelete }: Props) {
         </div>
         {onDelete && meal.id && (
           <button
-            onClick={() => onDelete(meal.id!)}
+            onClick={() => onDelete(meal)}
             className="text-gray-400 hover:text-red-500 text-xs"
           >
             Remove

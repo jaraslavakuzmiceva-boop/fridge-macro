@@ -1,7 +1,7 @@
 import { useLiveQuery } from 'dexie-react-hooks';
 import { db } from '../db';
 import { getLocalISODate } from '../logic/dateUtils';
-import type { Meal } from '../models/types';
+import type { InventoryItem, Meal } from '../models/types';
 
 export function useMeals() {
   const today = getLocalISODate();
@@ -18,8 +18,41 @@ export function useMeals() {
     } as Meal);
   }
 
-  async function deleteMeal(id: number) {
-    await db.meals.delete(id);
+  async function deleteMeal(meal: Meal) {
+    if (meal.sources && meal.sources.length > 0) {
+      await db.transaction('rw', db.meals, db.inventory, async () => {
+        for (const src of meal.sources!) {
+          if (src.inventoryId) {
+            const existing = await db.inventory.get(src.inventoryId);
+            if (existing) {
+              await db.inventory.update(src.inventoryId, {
+                quantity: existing.quantity + src.quantity,
+              });
+              continue;
+            }
+          }
+
+          const restored: InventoryItem = {
+            productId: src.productId,
+            quantity: src.quantity,
+            unit: src.unit,
+            storageLocation: src.storageLocation,
+            expirationDate: src.expirationDate,
+            addedAt: new Date().toISOString(),
+          };
+          await db.inventory.add(restored);
+        }
+
+        if (meal.id) {
+          await db.meals.delete(meal.id);
+        }
+      });
+      return;
+    }
+
+    if (meal.id) {
+      await db.meals.delete(meal.id);
+    }
   }
 
   return { todayMeals, logMeal, deleteMeal };

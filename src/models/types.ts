@@ -28,6 +28,15 @@ export interface MealItem {
   unit: 'g' | 'ml' | 'pieces';
 }
 
+export interface InventorySource {
+  inventoryId?: number;
+  productId: number;
+  quantity: number;
+  unit: 'g' | 'ml' | 'pieces';
+  storageLocation: StorageLocation;
+  expirationDate: string;
+}
+
 export interface Meal {
   id?: number;
   date: string; // ISO date string YYYY-MM-DD
@@ -38,6 +47,7 @@ export interface Meal {
   totalCarbs: number;
   totalSimpleCarbs: number;
   createdAt: string;
+  sources?: InventorySource[];
 }
 
 export interface Settings {

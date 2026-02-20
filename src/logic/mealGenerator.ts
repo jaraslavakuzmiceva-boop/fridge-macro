@@ -60,9 +60,9 @@ function generatePortionSizes(maxGrams: number, product: Product): number[] {
       if (g <= maxGrams) portions.push(g);
     }
   } else {
-    // 50g, 100g, 150g, 200g, 300g increments
-    for (const size of [50, 100, 150, 200, 300]) {
-      if (size <= maxGrams) portions.push(size);
+    // 5g increments
+    for (let size = 5; size <= maxGrams; size += 5) {
+      portions.push(size);
     }
   }
   if (portions.length === 0 && maxGrams > 0) {
