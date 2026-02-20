@@ -7,16 +7,19 @@ import { useInventory } from '../hooks/useInventory';
 import { MacroBar } from '../components/MacroBar';
 import { MealCard } from '../components/MealCard';
 import { MealSuggestionModal } from '../components/MealSuggestionModal';
+import { AddManualMealModal } from '../components/AddManualMealModal';
 import { getRemainingMacros, type MacroTotals } from '../logic/macroCalculator';
 import { generateMealCandidates } from '../logic/mealGenerator';
 import { countEggsInItems, EGG_MAX_PER_DAY, getEggProductId } from '../logic/eggRules';
-import type { Product, Meal } from '../models/types';
+import { getLocalISODate } from '../logic/dateUtils';
+import type { Product, Meal, MealItem } from '../models/types';
 
 export function TodayScreen() {
   const { settings } = useSettings();
   const { todayMeals, logMeal, deleteMeal } = useMeals();
   const { items: inventory, deductItems } = useInventory();
   const [showSuggestions, setShowSuggestions] = useState(false);
+  const [showManualEntry, setShowManualEntry] = useState(false);
 
   const allProducts = useLiveQuery(() => db.products.toArray()) ?? [];
   const productMap = useMemo(() => {
@@ -69,6 +72,22 @@ export function TodayScreen() {
     setShowSuggestions(false);
   }
 
+  async function handleLogManualMeal(
+    items: MealItem[],
+    totals: { kcal: number; protein: number; fat: number; carbs: number; simpleCarbs: number }
+  ) {
+    await logMeal({
+      date: getLocalISODate(),
+      items,
+      totalKcal: totals.kcal,
+      totalProtein: totals.protein,
+      totalFat: totals.fat,
+      totalCarbs: totals.carbs,
+      totalSimpleCarbs: totals.simpleCarbs,
+    });
+    setShowManualEntry(false);
+  }
+
   if (!settings) return <div className="p-4 text-gray-500">Loading...</div>;
 
   const simpleCarbPct = consumed.kcal > 0
@@ -94,12 +113,20 @@ export function TodayScreen() {
         </div>
       </div>
 
-      <button
-        onClick={() => setShowSuggestions(true)}
-        className="w-full py-3 bg-emerald-500 text-white rounded-xl font-semibold text-base hover:bg-emerald-600 transition-colors shadow-sm mb-4"
-      >
-        Generate Next Meal
-      </button>
+      <div className="flex gap-2 mb-4">
+        <button
+          onClick={() => setShowSuggestions(true)}
+          className="flex-1 py-3 bg-emerald-500 text-white rounded-xl font-semibold text-base hover:bg-emerald-600 transition-colors shadow-sm"
+        >
+          Generate Next Meal
+        </button>
+        <button
+          onClick={() => setShowManualEntry(true)}
+          className="flex-1 py-3 bg-white text-emerald-600 border border-emerald-400 rounded-xl font-semibold text-base hover:bg-emerald-50 transition-colors shadow-sm"
+        >
+          Add Meal Manually
+        </button>
+      </div>
 
       <div className="space-y-3">
         <h2 className="text-sm font-semibold text-gray-500 uppercase tracking-wide">
@@ -119,6 +146,14 @@ export function TodayScreen() {
           products={productMap}
           onAccept={handleAcceptMeal}
           onClose={() => setShowSuggestions(false)}
+        />
+      )}
+
+      {showManualEntry && (
+        <AddManualMealModal
+          products={productMap}
+          onLog={handleLogManualMeal}
+          onClose={() => setShowManualEntry(false)}
         />
       )}
     </div>
