@@ -1,0 +1,107 @@
+import { useState, useMemo } from 'react';
+import { useLiveQuery } from 'dexie-react-hooks';
+import { db } from '../db';
+import { useSettings } from '../hooks/useSettings';
+import { useMeals } from '../hooks/useMeals';
+import { useInventory } from '../hooks/useInventory';
+import { MacroBar } from '../components/MacroBar';
+import { MealCard } from '../components/MealCard';
+import { MealSuggestionModal } from '../components/MealSuggestionModal';
+import { getRemainingMacros, type MacroTotals } from '../logic/macroCalculator';
+import { generateMealCandidates } from '../logic/mealGenerator';
+import type { Product, Meal } from '../models/types';
+
+export function TodayScreen() {
+  const { settings } = useSettings();
+  const { todayMeals, logMeal, deleteMeal } = useMeals();
+  const { items: inventory, deductItems } = useInventory();
+  const [showSuggestions, setShowSuggestions] = useState(false);
+
+  const allProducts = useLiveQuery(() => db.products.toArray()) ?? [];
+  const productMap = useMemo(() => {
+    const map = new Map<number, Product>();
+    for (const p of allProducts) map.set(p.id!, p);
+    return map;
+  }, [allProducts]);
+
+  const consumed = useMemo<MacroTotals>(() => {
+    const totals: MacroTotals = { kcal: 0, protein: 0, fat: 0, carbs: 0, simpleCarbs: 0 };
+    for (const meal of todayMeals) {
+      totals.kcal += meal.totalKcal;
+      totals.protein += meal.totalProtein;
+      totals.fat += meal.totalFat;
+      totals.carbs += meal.totalCarbs;
+      totals.simpleCarbs += meal.totalSimpleCarbs;
+    }
+    return totals;
+  }, [todayMeals]);
+
+  const remaining = settings ? getRemainingMacros(settings, consumed) : null;
+  const mealsLeft = settings ? Math.max(1, settings.mealsPerDay - todayMeals.length) : 1;
+
+  const candidates = useMemo(() => {
+    if (!remaining || !settings) return [];
+    return generateMealCandidates(inventory, productMap, remaining, mealsLeft);
+  }, [inventory, productMap, remaining, mealsLeft, settings]);
+
+  async function handleAcceptMeal(meal: Omit<Meal, 'id' | 'createdAt'>) {
+    await logMeal(meal);
+    await deductItems(meal.items.map(i => ({ productId: i.productId, quantity: i.quantity, unit: i.unit })));
+    setShowSuggestions(false);
+  }
+
+  if (!settings) return <div className="p-4 text-gray-500">Loading...</div>;
+
+  const simpleCarbPct = consumed.kcal > 0
+    ? ((consumed.simpleCarbs * 4) / consumed.kcal * 100)
+    : 0;
+
+  return (
+    <div className="p-4 pb-24 max-w-lg mx-auto">
+      <h1 className="text-xl font-bold text-gray-800 mb-4">Today</h1>
+
+      <div className="bg-white rounded-xl p-4 shadow-sm border border-gray-100 mb-4">
+        <MacroBar label="Calories" current={consumed.kcal} target={settings.dailyKcal} unit="kcal" color="bg-blue-500" />
+        <MacroBar label="Protein" current={consumed.protein} target={settings.dailyProtein} unit="g" color="bg-red-400" />
+        <MacroBar label="Fat" current={consumed.fat} target={settings.dailyFat} unit="g" color="bg-yellow-400" />
+        <MacroBar label="Carbs" current={consumed.carbs} target={settings.dailyCarbs} unit="g" color="bg-green-500" />
+
+        <div className="mt-2 flex items-center gap-2">
+          <span className="text-xs text-gray-500">Simple carbs:</span>
+          <span className={`text-xs font-medium ${simpleCarbPct > settings.simpleCarbLimitPercent ? 'text-red-600' : 'text-gray-600'}`}>
+            {simpleCarbPct.toFixed(1)}% of kcal
+            {simpleCarbPct > settings.simpleCarbLimitPercent && ' (over limit!)'}
+          </span>
+        </div>
+      </div>
+
+      <button
+        onClick={() => setShowSuggestions(true)}
+        className="w-full py-3 bg-emerald-500 text-white rounded-xl font-semibold text-base hover:bg-emerald-600 transition-colors shadow-sm mb-4"
+      >
+        Generate Next Meal
+      </button>
+
+      <div className="space-y-3">
+        <h2 className="text-sm font-semibold text-gray-500 uppercase tracking-wide">
+          Today's Meals ({todayMeals.length})
+        </h2>
+        {todayMeals.length === 0 && (
+          <p className="text-sm text-gray-400">No meals logged yet. Generate your first meal!</p>
+        )}
+        {todayMeals.map(meal => (
+          <MealCard key={meal.id} meal={meal} products={productMap} onDelete={deleteMeal} />
+        ))}
+      </div>
+
+      {showSuggestions && (
+        <MealSuggestionModal
+          candidates={candidates}
+          products={productMap}
+          onAccept={handleAcceptMeal}
+          onClose={() => setShowSuggestions(false)}
+        />
+      )}
+    </div>
+  );
+}
