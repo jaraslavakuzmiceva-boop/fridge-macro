@@ -116,6 +116,12 @@ body::after {
   z-index: 9999;
 }
 
+@layer utilities {
+  .safe-area-bottom {
+    padding-bottom: max(env(safe-area-inset-bottom), 0px);
+  }
+}
+
 /* ── Component classes ── */
 @layer components {
 
