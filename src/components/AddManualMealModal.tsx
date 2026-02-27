@@ -126,7 +126,10 @@ export function AddManualMealModal({ products, onLog, onClose }: Props) {
   const [quantity, setQuantity] = useState('100');
   const [unit, setUnit] = useState<'g' | 'ml' | 'pieces'>('g');
   const [search, setSearch] = useState('');
-  const [speechLang, setSpeechLang] = useState<'en-US' | 'ru-RU'>('en-US');
+  const [speechLang, setSpeechLang] = useState<'en-US' | 'ru-RU'>(() => {
+    if (typeof navigator !== 'undefined' && /ru/i.test(navigator.language)) return 'ru-RU';
+    return 'en-US';
+  });
   const [transcript, setTranscript] = useState('');
   const [isListening, setIsListening] = useState(false);
   const [speechError, setSpeechError] = useState<string | null>(null);
@@ -266,7 +269,8 @@ export function AddManualMealModal({ products, onLog, onClose }: Props) {
     }
     setSpeechError(null);
     const recognition: SpeechRecognitionLike = new SpeechRecognitionCtor();
-    recognition.lang = speechLang;
+    const inferred = detectLang(transcript);
+    recognition.lang = transcript.trim() ? inferred : speechLang;
     recognition.interimResults = true;
     recognition.continuous = false;
     recognition.onresult = event => {
@@ -285,6 +289,9 @@ export function AddManualMealModal({ products, onLog, onClose }: Props) {
     };
     recognition.onend = () => {
       setIsListening(false);
+      if (!transcript.trim()) {
+        setSpeechError('No speech detected. Try again or switch device language to RU/EN.');
+      }
     };
     recognitionRef.current = recognition;
     setIsListening(true);
