@@ -25,10 +25,10 @@ export function getExpirationLabel(status: ExpirationStatus): string {
 
 export function getExpirationColor(status: ExpirationStatus): string {
   switch (status) {
-    case 'expired': return 'bg-emerald-900 text-white';
-    case 'd0': return 'bg-emerald-700 text-white';
-    case 'expiring-soon': return 'bg-emerald-500 text-black';
-    case 'ok': return 'bg-emerald-300 text-black';
+    case 'expired': return 'bg-rose-600 text-white';
+    case 'd0': return 'bg-yellow-400 text-black';
+    case 'expiring-soon': return 'bg-yellow-400 text-black';
+    case 'ok': return 'bg-yellow-400 text-black';
   }
 }
 

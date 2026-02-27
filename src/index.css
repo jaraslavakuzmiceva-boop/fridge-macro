@@ -1,5 +1,5 @@
 @import "tailwindcss";
-@import url('https://fonts.googleapis.com/css2?family=VT323&display=swap');
+/* Using system monospace stack to match macOS Terminal default. */
 
 /* ════════════════════════════════════════════
    RETRO PIXEL / DARK TERMINAL THEME
@@ -49,8 +49,8 @@
   --color-green-600: #1a8c30;
 
   /* ── Typography ── */
-  --font-sans: 'VT323', 'Courier New', monospace;
-  --font-mono: 'VT323', 'Courier New', monospace;
+  --font-sans: 'SF Mono', Menlo, Monaco, 'Courier New', monospace;
+  --font-mono: 'SF Mono', Menlo, Monaco, 'Courier New', monospace;
 
   /* ── Pixel-sharp corners ── */
   --radius-sm:   0px;
@@ -74,21 +74,21 @@
   body {
     background-color: #0a0a0f;
     color: #b8ddb8;
-    font-family: 'VT323', 'Courier New', monospace;
+    font-family: 'SF Mono', Menlo, Monaco, 'Courier New', monospace;
     font-size: 1.15rem;
     line-height: 1.5;
     -webkit-font-smoothing: none;
   }
 
   h1, h2, h3, h4 {
-    font-family: 'VT323', 'Courier New', monospace;
+    font-family: 'SF Mono', Menlo, Monaco, 'Courier New', monospace;
     line-height: 1.4;
     color: #39ff14;
     text-shadow: 0 0 10px rgba(57, 255, 20, 0.35);
   }
 
   input, select, textarea, button {
-    font-family: 'VT323', 'Courier New', monospace;
+    font-family: 'SF Mono', Menlo, Monaco, 'Courier New', monospace;
   }
 
   ::-webkit-scrollbar       { width: 8px; background: #0a0a0f; }
@@ -126,7 +126,7 @@ body::after {
 
   /* Primary button */
   .px-btn {
-    font-family: 'VT323', 'Courier New', monospace;
+    font-family: 'SF Mono', Menlo, Monaco, 'Courier New', monospace;
     font-size: 0.6rem;
     line-height: 1.8;
     background: #22a83e;
@@ -151,7 +151,7 @@ body::after {
 
   /* Outline button */
   .px-btn-outline {
-    font-family: 'VT323', 'Courier New', monospace;
+    font-family: 'SF Mono', Menlo, Monaco, 'Courier New', monospace;
     font-size: 0.6rem;
     line-height: 1.8;
     background: transparent;
@@ -175,7 +175,7 @@ body::after {
 
   /* Danger button */
   .px-btn-danger {
-    font-family: 'VT323', 'Courier New', monospace;
+    font-family: 'SF Mono', Menlo, Monaco, 'Courier New', monospace;
     font-size: 0.6rem;
     line-height: 1.8;
     background: #ee2244;
@@ -199,7 +199,7 @@ body::after {
     background: #08080e;
     color: #b8ddb8;
     border: 2px solid #1a3a1a;
-    font-family: 'VT323', 'Courier New', monospace;
+    font-family: 'SF Mono', Menlo, Monaco, 'Courier New', monospace;
     font-size: 1.2rem;
     padding: 8px 12px;
     outline: none;
@@ -236,7 +236,7 @@ body::after {
 
   /* Section label */
   .px-label {
-    font-family: 'VT323', 'Courier New', monospace;
+    font-family: 'SF Mono', Menlo, Monaco, 'Courier New', monospace;
     font-size: 0.5rem;
     color: #3d7a3d;
     text-transform: uppercase;

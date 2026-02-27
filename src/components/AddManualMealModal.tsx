@@ -547,7 +547,7 @@ export function AddManualMealModal({ products, onLog, onClose }: Props) {
                   </button>
                 </div>
                 {speechError && (
-                  <p className="text-xs text-emerald-400">{speechError}</p>
+                  <p className="text-xs text-rose-400">{speechError}</p>
                 )}
                 <textarea
                   placeholder="Speech transcript will appear here. You can edit before adding."

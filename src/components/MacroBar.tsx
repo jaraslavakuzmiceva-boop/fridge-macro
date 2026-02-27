@@ -14,7 +14,7 @@ export function MacroBar({ label, current, target, unit }: MacroBarProps) {
     <div className="mb-3">
       <div className="flex justify-between text-sm mb-1">
         <span className="font-medium text-white">{label}</span>
-        <span className={`text-xs flex items-center gap-1 ${isOver ? 'text-emerald-300 font-semibold' : 'text-emerald-400'}`}>
+        <span className={`text-xs flex items-center gap-1 ${isOver ? 'text-rose-400 font-semibold' : 'text-emerald-400'}`}>
           {isOver && <span>⚠️</span>}
           {Math.round(current)} / {target} {unit}
           {!isOver && ` (${Math.round(remaining)} left)`}
@@ -23,7 +23,7 @@ export function MacroBar({ label, current, target, unit }: MacroBarProps) {
       </div>
       <div className="w-full bg-emerald-900/60 rounded-full h-3">
         <div
-          className={`h-3 rounded-full transition-all duration-300 ${isOver ? 'bg-emerald-700' : 'bg-emerald-500'}`}
+          className={`h-3 rounded-full transition-all duration-300 ${isOver ? 'bg-rose-500' : 'bg-emerald-500'}`}
           style={{ width: `${pct}%` }}
         />
       </div>

@@ -128,7 +128,7 @@ export function TodayScreen() {
 
         <div className="mt-2 flex items-center gap-2">
           <span className="text-xs text-emerald-400">Simple carbs:</span>
-          <span className={`text-xs font-medium ${simpleCarbPct > settings.simpleCarbLimitPercent ? 'text-emerald-300' : 'text-emerald-400'}`}>
+          <span className={`text-xs font-medium ${simpleCarbPct > settings.simpleCarbLimitPercent ? 'text-rose-400' : 'text-emerald-400'}`}>
             {simpleCarbPct.toFixed(1)}% of kcal
             {simpleCarbPct > settings.simpleCarbLimitPercent && ' (over limit!)'}
           </span>
@@ -139,7 +139,7 @@ export function TodayScreen() {
         <button
           onClick={handleGenerateMeal}
           disabled={isGenerating}
-          className="flex-1 py-3 bg-black text-emerald-300 border border-emerald-700 rounded-xl font-semibold text-base hover:bg-emerald-900/30 transition-colors shadow-sm disabled:opacity-50 flex items-center justify-center gap-2"
+          className="flex-1 py-3 bg-emerald-500 text-black rounded-xl font-semibold text-base hover:bg-emerald-400 transition-colors shadow-sm disabled:opacity-50 flex items-center justify-center gap-2"
         >
           {isGenerating ? (
             <>

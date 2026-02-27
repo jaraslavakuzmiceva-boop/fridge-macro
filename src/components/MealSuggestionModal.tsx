@@ -18,8 +18,8 @@ function MacroCell({ label, actual, ideal }: { label: string; actual: number; id
   const color =
     dev === null ? 'text-emerald-300 bg-black border border-emerald-900/40'
     : Math.abs(dev) <= 0.10 ? 'text-emerald-200 bg-black border border-emerald-600/60'
-    : Math.abs(dev) <= 0.20 ? 'text-emerald-300 bg-black border border-emerald-700/60'
-    : 'text-emerald-400 bg-black border border-emerald-800/60';
+    : Math.abs(dev) <= 0.20 ? 'text-yellow-400 bg-black border border-yellow-500/50'
+    : 'text-rose-400 bg-black border border-rose-500/50';
   const arrow = dev === null ? '' : dev > 0.05 ? ' ↑' : dev < -0.05 ? ' ↓' : '';
 
   return (
@@ -82,6 +82,10 @@ export function MealSuggestionModal({ candidates, products, idealMacros, onAccep
 
         <div className="flex gap-2 mb-4">
           {candidates.map((c, idx) => {
+            const dotColor =
+              c.tier === 'green' ? 'text-emerald-400'
+              : c.tier === 'yellow' ? 'text-yellow-400'
+              : 'text-rose-400';
             return (
               <button
                 key={idx}
@@ -92,7 +96,7 @@ export function MealSuggestionModal({ candidates, products, idealMacros, onAccep
                     : 'bg-black text-emerald-300 border border-emerald-800/60'
                 }`}
               >
-                <span className="text-emerald-400">●</span> {c.totalKcal} kcal
+                <span className={dotColor}>●</span> {c.totalKcal} kcal
               </button>
             );
           })}

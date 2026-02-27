@@ -91,16 +91,16 @@ export function ForecastScreen() {
           </h2>
           <div className="space-y-2">
             {forecast.shoppingNeeded.map((suggestion, idx) => (
-              <div key={idx} className="p-3 bg-black border border-emerald-900/40 rounded-lg">
+              <div key={idx} className="p-3 bg-black border border-rose-500/50 rounded-lg">
                 <div className="flex items-start gap-2">
-                  <span className="text-emerald-400 mt-0.5">
+                  <span className="text-rose-400 mt-0.5">
                     <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L3.34 16.5c-.77.833.192 2.5 1.732 2.5z" />
                     </svg>
                   </span>
                   <div>
-                    <span className="text-xs text-emerald-300 font-medium uppercase">{suggestion.reason}</span>
-                    <p className="text-sm text-emerald-200">{suggestion.message}</p>
+                    <span className="text-xs text-rose-300 font-medium uppercase">{suggestion.reason}</span>
+                    <p className="text-sm text-rose-200">{suggestion.message}</p>
                   </div>
                 </div>
               </div>
