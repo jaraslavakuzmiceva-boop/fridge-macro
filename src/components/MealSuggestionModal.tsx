@@ -1,16 +1,41 @@
 import { useState } from 'react';
 import type { MealCandidate, Product, Meal } from '../models/types';
+import type { MacroTotals } from '../logic/macroCalculator';
 import { TierBadge } from './StatusBadge';
 import { getLocalISODate } from '../logic/dateUtils';
 
 interface Props {
   candidates: MealCandidate[];
   products: Map<number, Product>;
+  idealMacros: MacroTotals | null;
   onAccept: (meal: Omit<Meal, 'id' | 'createdAt'>) => void;
   onClose: () => void;
 }
 
-export function MealSuggestionModal({ candidates, products, onAccept, onClose }: Props) {
+function MacroCell({ label, actual, ideal }: { label: string; actual: number; ideal: number | null }) {
+  const dev = ideal && ideal > 0 ? (actual - ideal) / ideal : null;
+  const devPct = dev !== null ? Math.round(Math.abs(dev) * 100) : null;
+  const color =
+    dev === null ? 'text-gray-600 bg-gray-50'
+    : Math.abs(dev) <= 0.10 ? 'text-emerald-600 bg-emerald-50'
+    : Math.abs(dev) <= 0.20 ? 'text-yellow-600 bg-yellow-50'
+    : 'text-red-600 bg-red-50';
+  const arrow = dev === null ? '' : dev > 0.05 ? ' ↑' : dev < -0.05 ? ' ↓' : '';
+
+  return (
+    <div className={`rounded-lg p-2 text-center ${color}`}>
+      <div className="text-xs text-gray-500">{label}</div>
+      <div className="font-semibold text-sm">{actual}</div>
+      {ideal !== null && (
+        <div className="text-xs opacity-70">
+          / {ideal}{devPct !== null && devPct > 5 ? `${arrow} ${devPct}%` : ''}
+        </div>
+      )}
+    </div>
+  );
+}
+
+export function MealSuggestionModal({ candidates, products, idealMacros, onAccept, onClose }: Props) {
   const [selected, setSelected] = useState(0);
 
   if (candidates.length === 0) {
@@ -91,23 +116,14 @@ export function MealSuggestionModal({ candidates, products, onAccept, onClose }:
           })}
         </div>
 
-        <div className="grid grid-cols-4 gap-2 mb-4 text-center">
-          <div className="bg-blue-50 rounded-lg p-2">
-            <div className="text-xs text-gray-500">kcal</div>
-            <div className="font-semibold text-blue-600">{candidate.totalKcal}</div>
-          </div>
-          <div className="bg-red-50 rounded-lg p-2">
-            <div className="text-xs text-gray-500">Protein</div>
-            <div className="font-semibold text-red-600">{candidate.totalProtein}g</div>
-          </div>
-          <div className="bg-yellow-50 rounded-lg p-2">
-            <div className="text-xs text-gray-500">Fat</div>
-            <div className="font-semibold text-yellow-600">{candidate.totalFat}g</div>
-          </div>
-          <div className="bg-green-50 rounded-lg p-2">
-            <div className="text-xs text-gray-500">Carbs</div>
-            <div className="font-semibold text-green-600">{candidate.totalCarbs}g</div>
-          </div>
+        {idealMacros && (
+          <p className="text-xs text-gray-400 mb-1">vs ideal for this meal</p>
+        )}
+        <div className="grid grid-cols-4 gap-2 mb-4">
+          <MacroCell label="kcal" actual={candidate.totalKcal} ideal={idealMacros?.kcal ?? null} />
+          <MacroCell label="Protein" actual={candidate.totalProtein} ideal={idealMacros?.protein ?? null} />
+          <MacroCell label="Fat" actual={candidate.totalFat} ideal={idealMacros?.fat ?? null} />
+          <MacroCell label="Carbs" actual={candidate.totalCarbs} ideal={idealMacros?.carbs ?? null} />
         </div>
 
         <div className="flex gap-2">

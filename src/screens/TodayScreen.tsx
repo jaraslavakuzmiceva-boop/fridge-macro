@@ -8,7 +8,7 @@ import { MacroBar } from '../components/MacroBar';
 import { MealCard } from '../components/MealCard';
 import { MealSuggestionModal } from '../components/MealSuggestionModal';
 import { AddManualMealModal } from '../components/AddManualMealModal';
-import { getRemainingMacros, type MacroTotals } from '../logic/macroCalculator';
+import { getRemainingMacros, getIdealMealMacros, type MacroTotals } from '../logic/macroCalculator';
 import { generateMealCandidates } from '../logic/mealGenerator';
 import { countEggsInItems, EGG_MAX_PER_DAY, getEggProductId } from '../logic/eggRules';
 import { getLocalISODate } from '../logic/dateUtils';
@@ -175,6 +175,7 @@ export function TodayScreen() {
         <MealSuggestionModal
           candidates={candidates}
           products={productMap}
+          idealMacros={remaining ? getIdealMealMacros(remaining, mealsLeft) : null}
           onAccept={handleAcceptMeal}
           onClose={() => setShowSuggestions(false)}
         />
