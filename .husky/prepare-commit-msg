@@ -1,0 +1,14 @@
+#!/bin/sh
+
+# Skip for merge/squash commits
+case "$2" in
+  merge|squash) exit 0 ;;
+esac
+
+DIFF_STAT=$(git diff --staged --stat 2>/dev/null | head -20)
+
+if [ -z "$DIFF_STAT" ]; then
+  exit 0
+fi
+
+printf "\n\nChanged:\n%s" "$DIFF_STAT" >> "$1"
