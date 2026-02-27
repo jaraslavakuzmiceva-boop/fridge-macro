@@ -30,7 +30,7 @@ scheduleDailyCleanup();
 
 createRoot(document.getElementById('root')!).render(
   <StrictMode>
-    <BrowserRouter basename="/fridge-macro">
+    <BrowserRouter>
       <App />
     </BrowserRouter>
   </StrictMode>,
