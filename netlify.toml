@@ -2,6 +2,12 @@
   command = "npm run build"
   publish = "dist"
 
+# Compatibility redirect for old cached `/fridge-macro/*` asset paths.
+[[redirects]]
+  from = "/fridge-macro/*"
+  to = "/:splat"
+  status = 301
+
 # SPA routing fallback for React Router
 [[redirects]]
   from = "/*"
