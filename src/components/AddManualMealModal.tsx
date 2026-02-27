@@ -132,6 +132,9 @@ export function AddManualMealModal({ products, onLog, onClose }: Props) {
   const [speechError, setSpeechError] = useState<string | null>(null);
   const recognitionRef = useRef<SpeechRecognitionLike | null>(null);
   const gotResultRef = useRef(false);
+  const silenceTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const latestTranscriptRef = useRef('');
+  const autoAddOnEndRef = useRef(false);
 
   const filteredProducts = useMemo(() => {
     const q = search.trim();
@@ -290,8 +293,11 @@ export function AddManualMealModal({ products, onLog, onClose }: Props) {
     }
     setSpeechError(null);
     gotResultRef.current = false;
+    autoAddOnEndRef.current = false;
+    latestTranscriptRef.current = '';
+    const lang = speechLang;
     const recognition: SpeechRecognitionLike = new SpeechRecognitionCtor();
-    recognition.lang = speechLang;
+    recognition.lang = lang;
     recognition.interimResults = true;
     recognition.continuous = true;
     recognition.onresult = event => {
@@ -301,15 +307,38 @@ export function AddManualMealModal({ products, onLog, onClose }: Props) {
       }
       const trimmed = fullText.trim();
       if (trimmed) gotResultRef.current = true;
+      latestTranscriptRef.current = trimmed;
       setTranscript(trimmed);
+
+      // restart 2-second silence timer
+      if (silenceTimerRef.current) clearTimeout(silenceTimerRef.current);
+      if (trimmed) {
+        silenceTimerRef.current = setTimeout(() => {
+          autoAddOnEndRef.current = true;
+          recognitionRef.current?.stop();
+        }, 2000);
+      }
     };
     recognition.onerror = () => {
+      if (silenceTimerRef.current) clearTimeout(silenceTimerRef.current);
       setSpeechError('Could not capture speech. Please try again.');
       setIsListening(false);
     };
     recognition.onend = () => {
+      if (silenceTimerRef.current) clearTimeout(silenceTimerRef.current);
       setIsListening(false);
-      if (!gotResultRef.current && !transcript.trim()) {
+      if (autoAddOnEndRef.current && latestTranscriptRef.current.trim()) {
+        autoAddOnEndRef.current = false;
+        const parsed = parseSpeechToEntries(latestTranscriptRef.current, lang);
+        if (parsed.length > 0) {
+          setSpeechError(null);
+          setEntries(prev => [...prev, ...parsed]);
+          setTranscript('');
+          setShowSpeech(false);
+        } else {
+          setSpeechError('No ingredients recognized. Try saying e.g. "200 grams chicken breast" or "куриная грудка 200 грамм".');
+        }
+      } else if (!gotResultRef.current) {
         setSpeechError('No speech detected. Try again or check mic access.');
       }
     };
@@ -319,6 +348,7 @@ export function AddManualMealModal({ products, onLog, onClose }: Props) {
   }
 
   function stopSpeech() {
+    if (silenceTimerRef.current) clearTimeout(silenceTimerRef.current);
     recognitionRef.current?.stop();
   }
 
