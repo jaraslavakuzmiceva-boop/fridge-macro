@@ -549,19 +549,14 @@ export function AddManualMealModal({ products, onLog, onClose }: Props) {
                   </div>
                   <button
                     type="button"
-                    onClick={startSpeech}
-                    disabled={isListening}
-                    className="px-3 py-2 rounded-lg text-sm font-semibold bg-emerald-100 text-emerald-700 disabled:bg-gray-200 disabled:text-gray-400 transition-colors"
+                    onClick={isListening ? stopSpeech : startSpeech}
+                    className={`px-3 py-2 rounded-lg text-sm font-semibold transition-colors ${
+                      isListening
+                        ? 'bg-emerald-600 text-white'
+                        : 'bg-emerald-100 text-emerald-700'
+                    }`}
                   >
-                    Start
-                  </button>
-                  <button
-                    type="button"
-                    onClick={stopSpeech}
-                    disabled={!isListening}
-                    className="px-3 py-2 rounded-lg text-sm font-semibold bg-emerald-600 text-white disabled:bg-gray-200 disabled:text-gray-400 transition-colors"
-                  >
-                    Stop
+                    {isListening ? 'Stop' : 'Start'}
                   </button>
                 </div>
                 {speechError && (
