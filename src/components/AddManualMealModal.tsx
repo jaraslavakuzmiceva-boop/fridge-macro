@@ -581,6 +581,7 @@ export function AddManualMealModal({ products, onLog, onClose }: Props) {
             )}
 
             {/* 2. Product search */}
+            <p className="text-xs font-semibold text-gray-500 uppercase tracking-wide">Add manually</p>
             <div className="relative">
               <input
                 type="text"
