@@ -521,42 +521,29 @@ export function AddManualMealModal({ products, onLog, onClose }: Props) {
               }`}
             >
               <span className="text-base">🎤</span>
-              {isListening ? 'Listening…' : 'Voice input'}
+              {isListening ? 'Stop recording' : 'Voice input'}
             </button>
 
             {showSpeech && (
               <div className="space-y-2">
-                <div className="flex items-center gap-2 flex-wrap">
-                  <div className="flex rounded-lg border border-gray-200 overflow-hidden">
-                    <button
-                      type="button"
-                      onClick={() => setSpeechLang('ru-RU')}
-                      className={`px-2 py-2 text-xs font-semibold ${
-                        speechLang === 'ru-RU' ? 'bg-emerald-600 text-white' : 'bg-white text-gray-500'
-                      }`}
-                    >
-                      RU
-                    </button>
-                    <button
-                      type="button"
-                      onClick={() => setSpeechLang('en-US')}
-                      className={`px-2 py-2 text-xs font-semibold ${
-                        speechLang === 'en-US' ? 'bg-emerald-600 text-white' : 'bg-white text-gray-500'
-                      }`}
-                    >
-                      EN
-                    </button>
-                  </div>
+                <div className="flex rounded-lg border border-gray-200 overflow-hidden self-start">
                   <button
                     type="button"
-                    onClick={isListening ? stopSpeech : startSpeech}
-                    className={`px-3 py-2 rounded-lg text-sm font-semibold transition-colors ${
-                      isListening
-                        ? 'bg-emerald-600 text-white'
-                        : 'bg-emerald-100 text-emerald-700'
+                    onClick={() => setSpeechLang('ru-RU')}
+                    className={`px-2 py-2 text-xs font-semibold ${
+                      speechLang === 'ru-RU' ? 'bg-emerald-600 text-white' : 'bg-white text-gray-500'
                     }`}
                   >
-                    {isListening ? 'Stop' : 'Start'}
+                    RU
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => setSpeechLang('en-US')}
+                    className={`px-2 py-2 text-xs font-semibold ${
+                      speechLang === 'en-US' ? 'bg-emerald-600 text-white' : 'bg-white text-gray-500'
+                    }`}
+                  >
+                    EN
                   </button>
                 </div>
                 {speechError && (
