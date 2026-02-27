@@ -284,9 +284,8 @@ export function AddManualMealModal({ products, onLog, onClose }: Props) {
   }
 
   function startSpeech() {
-    const SpeechRecognitionCtor =
-      window.SpeechRecognition ||
-      (window as Window & { webkitSpeechRecognition?: SpeechRecognitionConstructor }).webkitSpeechRecognition;
+    const win = window as Window & { SpeechRecognition?: SpeechRecognitionConstructor; webkitSpeechRecognition?: SpeechRecognitionConstructor };
+    const SpeechRecognitionCtor = win.SpeechRecognition || win.webkitSpeechRecognition;
     if (!SpeechRecognitionCtor) {
       setSpeechError('Speech recognition not supported in this browser.');
       return;
