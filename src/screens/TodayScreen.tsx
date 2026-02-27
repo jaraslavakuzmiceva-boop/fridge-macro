@@ -153,14 +153,17 @@ export function TodayScreen() {
         </button>
         <button
           onClick={() => setShowManualEntry(true)}
-          className="flex-1 py-3 bg-black text-emerald-300 border border-emerald-700 rounded-xl font-semibold text-base hover:bg-emerald-900/30 transition-colors shadow-sm"
+          className="flex-1 py-3 bg-black text-emerald-500 border border-emerald-500 rounded-xl font-semibold text-base hover:bg-emerald-900/30 transition-colors shadow-sm"
         >
           Add Meal Manually
         </button>
       </div>
 
       <div className="space-y-3">
-        <h2 className="text-sm font-semibold text-emerald-300 uppercase tracking-wide">
+        <h2
+          className="text-sm font-semibold uppercase tracking-wide"
+          style={{ textShadow: 'none', backgroundColor: 'transparent', color: 'rgb(16 185 129)' }}
+        >
           Today's Meals ({todayMeals.length})
         </h2>
         {todayMeals.length === 0 && (

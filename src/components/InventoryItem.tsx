@@ -18,7 +18,7 @@ export function InventoryItemRow({ item, product, onEdit, onRemove }: Props) {
     <div className="flex items-center justify-between p-3 bg-black rounded-lg border border-emerald-900/40 shadow-[0_0_0_1px_rgba(16,185,129,0.08)]">
       <div className="flex-1 min-w-0">
         <div className="flex items-center gap-2">
-          <span className="font-medium text-white truncate">
+          <span className="text-sm font-medium text-white truncate">
             {product?.name ?? 'Unknown'}
           </span>
           <ExpirationBadge status={status} />
