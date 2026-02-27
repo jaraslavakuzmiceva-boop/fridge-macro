@@ -405,6 +405,7 @@ export function AddManualMealModal({ products, onLog, onClose }: Props) {
 
   const [showDropdown, setShowDropdown] = useState(false);
   const [showManualRow, setShowManualRow] = useState(false);
+  const [showSpeech, setShowSpeech] = useState(false);
 
   return (
     <div className="fixed inset-0 bg-black/50 z-50 flex items-end sm:items-center justify-center">
@@ -449,9 +450,83 @@ export function AddManualMealModal({ products, onLog, onClose }: Props) {
 
           {/* Add product row */}
           <div className="bg-gray-50 rounded-xl p-4 space-y-3">
-            <p className="text-xs font-semibold text-gray-500 uppercase tracking-wide">Add Product</p>
 
-            {/* Product search */}
+            {/* 1. Speech to text */}
+            <button
+              type="button"
+              onClick={() => setShowSpeech(v => !v)}
+              className={`flex items-center gap-2 px-3 py-2 rounded-lg text-sm font-semibold transition-colors ${
+                showSpeech
+                  ? 'bg-emerald-600 text-white'
+                  : 'bg-white border border-gray-200 text-gray-600 hover:bg-emerald-50'
+              }`}
+            >
+              <span className="text-base">🎤</span>
+              {isListening ? 'Listening…' : 'Voice input'}
+            </button>
+
+            {showSpeech && (
+              <div className="space-y-2">
+                <div className="flex items-center gap-2 flex-wrap">
+                  <div className="flex rounded-lg border border-gray-200 overflow-hidden">
+                    <button
+                      type="button"
+                      onClick={() => setSpeechLang('ru-RU')}
+                      className={`px-2 py-2 text-xs font-semibold ${
+                        speechLang === 'ru-RU' ? 'bg-emerald-600 text-white' : 'bg-white text-gray-500'
+                      }`}
+                    >
+                      RU
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => setSpeechLang('en-US')}
+                      className={`px-2 py-2 text-xs font-semibold ${
+                        speechLang === 'en-US' ? 'bg-emerald-600 text-white' : 'bg-white text-gray-500'
+                      }`}
+                    >
+                      EN
+                    </button>
+                  </div>
+                  <button
+                    type="button"
+                    onClick={startSpeech}
+                    disabled={isListening}
+                    className="px-3 py-2 rounded-lg text-sm font-semibold bg-emerald-100 text-emerald-700 disabled:bg-gray-200 disabled:text-gray-400 transition-colors"
+                  >
+                    Start
+                  </button>
+                  <button
+                    type="button"
+                    onClick={stopSpeech}
+                    disabled={!isListening}
+                    className="px-3 py-2 rounded-lg text-sm font-semibold bg-emerald-600 text-white disabled:bg-gray-200 disabled:text-gray-400 transition-colors"
+                  >
+                    Stop
+                  </button>
+                </div>
+                {speechError && (
+                  <p className="text-xs text-red-500">{speechError}</p>
+                )}
+                <textarea
+                  placeholder="Speech transcript will appear here. You can edit before adding."
+                  value={transcript}
+                  onChange={e => setTranscript(e.target.value)}
+                  className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm bg-white focus:outline-none focus:ring-2 focus:ring-emerald-400"
+                  rows={2}
+                />
+                <button
+                  type="button"
+                  onClick={handleSpeechAdd}
+                  disabled={!transcript.trim()}
+                  className="w-full py-2 bg-emerald-500 disabled:bg-gray-200 disabled:text-gray-400 text-white rounded-lg text-sm font-semibold hover:bg-emerald-600 transition-colors"
+                >
+                  Add Items From Speech
+                </button>
+              </div>
+            )}
+
+            {/* 2. Product search */}
             <div className="relative">
               <input
                 type="text"
@@ -482,69 +557,6 @@ export function AddManualMealModal({ products, onLog, onClose }: Props) {
                   ))}
                 </div>
               )}
-            </div>
-
-            {/* Speech to text */}
-            <div className="space-y-2">
-              <div className="flex items-center gap-2">
-                <div className="flex rounded-lg border border-gray-200 overflow-hidden">
-                  <button
-                    type="button"
-                    onClick={() => setSpeechLang('ru-RU')}
-                    className={`px-2 py-2 text-xs font-semibold ${
-                      speechLang === 'ru-RU' ? 'bg-emerald-600 text-white' : 'bg-white text-gray-500'
-                    }`}
-                  >
-                    RU
-                  </button>
-                  <button
-                    type="button"
-                    onClick={() => setSpeechLang('en-US')}
-                    className={`px-2 py-2 text-xs font-semibold ${
-                      speechLang === 'en-US' ? 'bg-emerald-600 text-white' : 'bg-white text-gray-500'
-                    }`}
-                  >
-                    EN
-                  </button>
-                </div>
-                <div className="flex gap-2">
-                  <button
-                    type="button"
-                    onClick={startSpeech}
-                    disabled={isListening}
-                    className="px-3 py-2 rounded-lg text-sm font-semibold bg-emerald-100 text-emerald-700 disabled:bg-gray-200 disabled:text-gray-400 transition-colors"
-                  >
-                    Start
-                  </button>
-                  <button
-                    type="button"
-                    onClick={stopSpeech}
-                    disabled={!isListening}
-                    className="px-3 py-2 rounded-lg text-sm font-semibold bg-emerald-600 text-white disabled:bg-gray-200 disabled:text-gray-400 transition-colors"
-                  >
-                    Stop
-                  </button>
-                </div>
-                <span className="text-xs text-gray-400">Choose language</span>
-              </div>
-              {speechError && (
-                <p className="text-xs text-red-500">{speechError}</p>
-              )}
-              <textarea
-                placeholder="Speech transcript will appear here. You can edit before adding."
-                value={transcript}
-                onChange={e => setTranscript(e.target.value)}
-                className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm bg-white focus:outline-none focus:ring-2 focus:ring-emerald-400"
-                rows={2}
-              />
-              <button
-                type="button"
-                onClick={handleSpeechAdd}
-                disabled={!transcript.trim()}
-                className="w-full py-2 bg-emerald-500 disabled:bg-gray-200 disabled:text-gray-400 text-white rounded-lg text-sm font-semibold hover:bg-emerald-600 transition-colors"
-              >
-                Add Items From Speech
-              </button>
             </div>
 
             {/* Quantity + unit (collapsed by default) */}
