@@ -157,27 +157,27 @@ export function AddManualMealModal({ products, onLog, onClose }: Props) {
 
   function applyRussianAliases(input: string): string {
     const aliases: Array<[RegExp, string]> = [
-      [/\bкурин(ая|ые)?\s+грудк(а|и)?\b/g, 'chicken breast'],
-      [/\bрис\b|\bрис\s*бел(ый|ого|ый)\b/g, 'rice (white)'],
-      [/\bяйц(о|а|ы)?\b/g, 'eggs'],
-      [/\bброкколи\b/g, 'broccoli'],
-      [/\bлосос(ь|я)\b|\bсемг(а|и)?\b/g, 'salmon'],
-      [/\bгреческ(ий|ого|ая)?\s+йогурт\b|\bйогурт\s+греческ(ий|ого|ая)?\b/g, 'greek yogurt'],
-      [/\bовсян(ка|ые хлопья)?\b/g, 'oats'],
-      [/\bбанан(ы|а)?\b/g, 'banana'],
-      [/\bоливков(ое|ого)?\s+масл(о|а)?\b|\bмасл(о|а)?\s+оливков(ое|ого)?\b/g, 'olive oil'],
-      [/\bбатат\b|\bсладк(ий|ого)?\s+картофел(ь|я)\b/g, 'sweet potato'],
-      [/\bтворог\b|\bтворожн(ый|ого)?\s+сыр\b/g, 'cottage cheese'],
-      [/\bминдал(ь|я)?\b/g, 'almonds'],
-      [/\bговяж(ий|его)?\s+фарш\b|\bфарш\s+говяж(ий|его)?\b/g, 'ground beef (lean)'],
-      [/\bмакарон(ы|ов|а)?\b|\bпаста\b/g, 'pasta'],
-      [/\bпомидор(ы|а)?\b|\bтомат(ы|а)?\b/g, 'tomatoes'],
-      [/\bавокадо\b/g, 'avocado'],
-      [/\bмолок(о|а)\b/g, 'milk (2%)'],
-      [/\bхлеб\b|\bцельнозернов(ой|ого)?\s+хлеб\b/g, 'bread (whole wheat)'],
-      [/\bиндейк(а|и)?\b|\bгрудк(а|и)?\s+индейк(и|а)?\b/g, 'turkey breast'],
-      [/\bшпинат\b/g, 'spinach'],
-      [/\bкуриц(а|ы)?\b|\bкурин(ая|ые)?\b/g, 'chicken breast'],
+      [/курин[а-яё]*\s+грудк[а-яё]*/g, 'chicken breast'],
+      [/рис[а-яё]*\s+бел[а-яё]*|бел[а-яё]*\s+рис[а-яё]*|рис[а-яё]*/g, 'rice (white)'],
+      [/яйц[а-яё]*/g, 'eggs'],
+      [/брокколи/g, 'broccoli'],
+      [/лосос[а-яё]*|семг[а-яё]*/g, 'salmon'],
+      [/греческ[а-яё]*\s+йогурт[а-яё]*|йогурт[а-яё]*\s+греческ[а-яё]*/g, 'greek yogurt'],
+      [/овсян[а-яё]*/g, 'oats'],
+      [/банан[а-яё]*/g, 'banana'],
+      [/оливков[а-яё]*\s+масл[а-яё]*|масл[а-яё]*\s+оливков[а-яё]*/g, 'olive oil'],
+      [/батат[а-яё]*|сладк[а-яё]*\s+картофел[а-яё]*/g, 'sweet potato'],
+      [/творожн[а-яё]*\s+сыр[а-яё]*|творог[а-яё]*/g, 'cottage cheese'],
+      [/миндал[а-яё]*/g, 'almonds'],
+      [/говяж[а-яё]*\s+фарш[а-яё]*|фарш[а-яё]*\s+говяж[а-яё]*/g, 'ground beef (lean)'],
+      [/макарон[а-яё]*|паст[а-яё]*/g, 'pasta'],
+      [/помидор[а-яё]*|томат[а-яё]*/g, 'tomatoes'],
+      [/авокадо/g, 'avocado'],
+      [/молок[а-яё]*/g, 'milk (2%)'],
+      [/цельнозернов[а-яё]*\s+хлеб[а-яё]*|хлеб[а-яё]*/g, 'bread (whole wheat)'],
+      [/грудк[а-яё]*\s+индейк[а-яё]*|индейк[а-яё]*/g, 'turkey breast'],
+      [/шпинат[а-яё]*/g, 'spinach'],
+      [/куриц[а-яё]*|курин[а-яё]*/g, 'chicken breast'],
     ];
     let out = input;
     for (const [re, rep] of aliases) out = out.replace(re, rep);
@@ -193,7 +193,7 @@ export function AddManualMealModal({ products, onLog, onClose }: Props) {
     if (!normalized) return [];
 
     if (lang === 'ru-RU') {
-      normalized = normalized.replace(/\b(я|съел(а)?|поел(а)?|ел(а)?|ем|кушал(а)?|сегодня|вчера|на|завтрак|обед|ужин)\b/g, '').trim();
+      normalized = normalized.replace(/(?<![а-яё])(я|съел[а-яё]*|поел[а-яё]*|ел[а-яё]*|ем|кушал[а-яё]*|сегодня|вчера|на|завтрак|обед|ужин)(?![а-яё])/g, '').replace(/\s+/g, ' ').trim();
     } else {
       normalized = normalized.replace(/\b(i|ate|had|for|breakfast|lunch|dinner|today|yesterday)\b/g, '').trim();
     }
@@ -242,24 +242,24 @@ export function AddManualMealModal({ products, onLog, onClose }: Props) {
         s = s.replace(numMatch[0], '').trim();
       }
 
-      if (s.match(/\bkg\b|\bkilogram(s)?\b|\bкг\b|\bкилограмм(а|ов)?\b/)) {
+      if (s.match(/\bkg\b|\bkilogram(?:s)?\b|(?<![а-яё])кг(?![а-яё])|килограмм(?:а|ов)?(?![а-яё])/)) {
         unit = 'g';
         if (qty !== null) qty = qty * 1000;
-        s = s.replace(/\bkg\b|\bkilogram(s)?\b|\bкг\b|\bкилограмм(а|ов)?\b/g, '').trim();
-      } else if (s.match(/\bl\b|\bliter(s)?\b|\bл\b|\bлитр(а|ов)?\b/)) {
+        s = s.replace(/\bkg\b|\bkilogram(?:s)?\b|(?<![а-яё])кг(?![а-яё])|килограмм(?:а|ов)?(?![а-яё])/g, '').trim();
+      } else if (s.match(/\bl\b|\bliter(?:s)?\b|(?<![а-яё])л(?![а-яё])|литр(?:а|ов)?(?![а-яё])/)) {
         unit = 'ml';
         if (qty !== null) qty = qty * 1000;
-        s = s.replace(/\bl\b|\bliter(s)?\b|\bл\b|\bлитр(а|ов)?\b/g, '').trim();
-      } else if (s.match(/\bg\b|\bgram(s)?\b|\bг\b|\bгр\b|\bграмм(а|ов)?\b/)) {
+        s = s.replace(/\bl\b|\bliter(?:s)?\b|(?<![а-яё])л(?![а-яё])|литр(?:а|ов)?(?![а-яё])/g, '').trim();
+      } else if (s.match(/\bg\b|\bgram(?:s)?\b|(?<![а-яё])г(?![а-яё])|(?<![а-яё])гр(?![а-яё])|грамм(?:а|ов)?(?![а-яё])/)) {
         unit = 'g';
-        s = s.replace(/\bg\b|\bgram(s)?\b|\bг\b|\bгр\b|\bграмм(а|ов)?\b/g, '').trim();
-      } else if (s.match(/\bml\b|\bmilliliter(s)?\b|\bмл\b|\bмиллилитр(а|ов)?\b/)) {
+        s = s.replace(/\bg\b|\bgram(?:s)?\b|(?<![а-яё])г(?![а-яё])|(?<![а-яё])гр(?![а-яё])|грамм(?:а|ов)?(?![а-яё])/g, '').trim();
+      } else if (s.match(/\bml\b|\bmilliliter(?:s)?\b|(?<![а-яё])мл(?![а-яё])|миллилитр(?:а|ов)?(?![а-яё])/)) {
         unit = 'ml';
-        s = s.replace(/\bml\b|\bmilliliter(s)?\b|\bмл\b|\bмиллилитр(а|ов)?\b/g, '').trim();
-      } else if (s.match(/\bpcs?\b|\bpieces?\b|\bшт\b|\bштук(а|и)?\b|\bштуки\b/)) {
+        s = s.replace(/\bml\b|\bmilliliter(?:s)?\b|(?<![а-яё])мл(?![а-яё])|миллилитр(?:а|ов)?(?![а-яё])/g, '').trim();
+      } else if (s.match(/\bpcs?\b|\bpieces?\b|(?<![а-яё])шт(?![а-яё])|штук(?:а|и)?(?![а-яё])/)) {
         unit = 'pieces';
-        s = s.replace(/\bpcs?\b|\bpieces?\b|\bшт\b|\bштук(а|и)?\b|\bштуки\b/g, '').trim();
-      } else if (s.match(/\begg(s)?\b|\bяйц(о|а|ы)?\b/)) {
+        s = s.replace(/\bpcs?\b|\bpieces?\b|(?<![а-яё])шт(?![а-яё])|штук(?:а|и)?(?![а-яё])/g, '').trim();
+      } else if (s.match(/\begg(?:s)?\b|яйц(?:о|а|ы)?(?![а-яё])/)) {
         unit = 'pieces';
       }
 
@@ -295,15 +295,13 @@ export function AddManualMealModal({ products, onLog, onClose }: Props) {
     recognition.interimResults = true;
     recognition.continuous = true;
     recognition.onresult = event => {
-      let finalText = '';
-      let interimText = '';
-      for (let i = event.resultIndex; i < event.results.length; i++) {
-        const result = event.results[i];
-        if (result.isFinal) finalText += result[0].transcript + ' ';
-        else interimText += result[0].transcript + ' ';
+      let fullText = '';
+      for (let i = 0; i < event.results.length; i++) {
+        fullText += event.results[i][0].transcript + ' ';
       }
-      if ((finalText + interimText).trim()) gotResultRef.current = true;
-      setTranscript((finalText + interimText).trim());
+      const trimmed = fullText.trim();
+      if (trimmed) gotResultRef.current = true;
+      setTranscript(trimmed);
     };
     recognition.onerror = () => {
       setSpeechError('Could not capture speech. Please try again.');
@@ -326,7 +324,11 @@ export function AddManualMealModal({ products, onLog, onClose }: Props) {
 
   function handleSpeechAdd() {
     const parsed = parseSpeechToEntries(transcript, speechLang);
-    if (parsed.length === 0) return;
+    if (parsed.length === 0) {
+      setSpeechError('No ingredients recognized. Try saying e.g. "200 grams chicken breast" or "куриная грудка 200 грамм".');
+      return;
+    }
+    setSpeechError(null);
     setEntries(prev => [...prev, ...parsed]);
     setTranscript('');
   }
