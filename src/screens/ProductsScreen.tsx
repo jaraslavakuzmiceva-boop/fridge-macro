@@ -41,7 +41,7 @@ export function ProductsScreen() {
 
       <div className="space-y-2">
         {filtered.map(product => (
-          <div key={product.id} className="p-3 bg-black rounded-lg shadow-sm border border-emerald-900/40">
+          <div key={product.id} className="p-3 bg-black rounded-lg border border-emerald-900/40 shadow-[0_0_0_1px_rgba(16,185,129,0.12)]">
             <div className="flex justify-between items-start">
               <div>
                 <div className="font-medium text-white">{product.name}</div>

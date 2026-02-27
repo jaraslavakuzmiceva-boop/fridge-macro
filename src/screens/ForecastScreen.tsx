@@ -44,7 +44,7 @@ export function ForecastScreen() {
       <div className={`p-4 rounded-xl border-2 mb-4 ${tierColors[forecast.tier]}`}>
         <div className="flex items-center gap-2 mb-2">
           <TierBadge tier={forecast.tier} />
-          <span className="text-sm font-medium text-emerald-200">Overall Status</span>
+          <span className="text-sm font-medium text-emerald-300">Overall Status</span>
         </div>
         <p className="text-sm text-emerald-300">{tierMessages[forecast.tier]}</p>
       </div>
@@ -54,14 +54,14 @@ export function ForecastScreen() {
       </h2>
 
       {forecast.meals.length === 0 && (
-        <p className="text-sm text-emerald-400 mb-4">No meals could be generated from tomorrow's inventory.</p>
+        <p className="text-sm text-emerald-300 mb-4">No meals could be generated from tomorrow's inventory.</p>
       )}
 
       <div className="space-y-3 mb-6">
         {forecast.meals.map((meal, idx) => (
-          <div key={idx} className="p-3 bg-black rounded-lg shadow-sm border border-emerald-900/40">
+          <div key={idx} className="p-3 bg-black rounded-lg border border-emerald-900/40 shadow-[0_0_0_1px_rgba(16,185,129,0.12)]">
             <div className="flex items-center gap-2 mb-2">
-              <span className="text-sm font-medium text-emerald-200">Meal {idx + 1}</span>
+              <span className="text-sm font-medium text-emerald-300">Meal {idx + 1}</span>
               <TierBadge tier={meal.tier} />
             </div>
             <div className="space-y-1 mb-2">
@@ -91,7 +91,7 @@ export function ForecastScreen() {
           </h2>
           <div className="space-y-2">
             {forecast.shoppingNeeded.map((suggestion, idx) => (
-              <div key={idx} className="p-3 bg-black border border-rose-500/50 rounded-lg">
+              <div key={idx} className="p-3 bg-black border border-emerald-900/40 rounded-lg shadow-[0_0_0_1px_rgba(16,185,129,0.12)]">
                 <div className="flex items-start gap-2">
                   <span className="text-rose-400 mt-0.5">
                     <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -100,7 +100,7 @@ export function ForecastScreen() {
                   </span>
                   <div>
                     <span className="text-xs text-rose-300 font-medium uppercase">{suggestion.reason}</span>
-                    <p className="text-sm text-rose-200">{suggestion.message}</p>
+                    <p className="text-sm text-emerald-300">{suggestion.message}</p>
                   </div>
                 </div>
               </div>

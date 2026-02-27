@@ -52,7 +52,7 @@ function SettingsForm({
 
   return (
     <form onSubmit={handleSave}>
-      <div className="bg-black rounded-xl p-4 shadow-sm border border-emerald-900/40 mb-4">
+      <div className="bg-black rounded-xl p-4 border border-emerald-900/40 shadow-[0_0_0_1px_rgba(16,185,129,0.12)] mb-4">
         <h2 className="text-sm font-semibold text-emerald-300 uppercase tracking-wide mb-3">Daily Macro Goals</h2>
 
         <div className="space-y-3">
@@ -106,7 +106,7 @@ function SettingsForm({
         </div>
       </div>
 
-      <div className="bg-black rounded-xl p-4 shadow-sm border border-emerald-900/40 mb-4">
+      <div className="bg-black rounded-xl p-4 border border-emerald-900/40 shadow-[0_0_0_1px_rgba(16,185,129,0.12)] mb-4">
         <h2 className="text-sm font-semibold text-emerald-300 uppercase tracking-wide mb-3">Preferences</h2>
 
         <div className="space-y-3">
