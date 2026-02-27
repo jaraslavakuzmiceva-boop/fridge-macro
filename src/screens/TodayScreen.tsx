@@ -182,6 +182,7 @@ export function TodayScreen() {
       {showManualEntry && (
         <AddManualMealModal
           products={productMap}
+          idealMacros={remaining ? getIdealMealMacros(remaining, mealsLeft) : null}
           onLog={handleLogManualMeal}
           onClose={() => setShowManualEntry(false)}
         />

@@ -1,6 +1,15 @@
 import { useState, useMemo, useRef } from 'react';
 import { calcItemMacros } from '../logic/macroCalculator';
+import type { MacroTotals } from '../logic/macroCalculator';
 import type { Product, MealItem } from '../models/types';
+
+function macroColor(actual: number, ideal: number | undefined): string {
+  if (!ideal || ideal <= 0) return '';
+  const dev = Math.abs(actual - ideal) / ideal;
+  if (dev <= 0.10) return 'neon-green';
+  if (dev <= 0.20) return 'neon-yellow';
+  return 'neon-red';
+}
 
 type SpeechRecognitionLike = {
   lang: string;
@@ -111,11 +120,12 @@ interface ManualEntry {
 
 interface Props {
   products: Map<number, Product>;
+  idealMacros?: MacroTotals | null;
   onLog: (items: MealItem[], totals: { kcal: number; protein: number; fat: number; carbs: number; simpleCarbs: number }) => void;
   onClose: () => void;
 }
 
-export function AddManualMealModal({ products, onLog, onClose }: Props) {
+export function AddManualMealModal({ products, idealMacros, onLog, onClose }: Props) {
   const productList = useMemo(
     () => Array.from(products.values()).sort((a, b) => a.name.localeCompare(b.name)),
     [products]
@@ -452,14 +462,14 @@ export function AddManualMealModal({ products, onLog, onClose }: Props) {
               <p className="px-label mb-2">Meal Total</p>
               <div className="grid grid-cols-4 gap-2 text-center">
                 {[
-                  { label: 'Calories', value: `${totals.kcal}`, unit: 'kcal' },
-                  { label: 'Protein',  value: `${totals.protein}`, unit: 'g' },
-                  { label: 'Fat',      value: `${totals.fat}`, unit: 'g' },
-                  { label: 'Carbs',    value: `${totals.carbs}`, unit: 'g' },
-                ].map(({ label, value, unit: u }) => (
+                  { label: 'Calories', value: totals.kcal,     ideal: idealMacros?.kcal,     unit: 'kcal' },
+                  { label: 'Protein',  value: totals.protein,  ideal: idealMacros?.protein,  unit: 'g' },
+                  { label: 'Fat',      value: totals.fat,      ideal: idealMacros?.fat,       unit: 'g' },
+                  { label: 'Carbs',    value: totals.carbs,    ideal: idealMacros?.carbs,     unit: 'g' },
+                ].map(({ label, value, ideal, unit: u }) => (
                   <div key={label} className="px-card p-2">
                     <p className="px-label">{label}</p>
-                    <p className="tx-value mt-1">{value}</p>
+                    <p className={`tx-value mt-1 ${macroColor(value, ideal)}`}>{value}</p>
                     <p className="px-label mt-0.5">{u}</p>
                   </div>
                 ))}

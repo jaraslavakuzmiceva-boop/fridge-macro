@@ -51,7 +51,8 @@ function getAvailableProducts(
 }
 
 function generatePortionSizes(maxGrams: number, product: Product): number[] {
-  // Generate reasonable portion sizes in grams
+  // Generate reasonable portion sizes in grams, capped at 8 options per product
+  // so 3-item combos stay within ~512 iterations total.
   const portions: number[] = [];
   if (product.defaultUnit === 'pieces' && product.pieceWeightG) {
     // 1, 2, 3 pieces
@@ -60,8 +61,9 @@ function generatePortionSizes(maxGrams: number, product: Product): number[] {
       if (g <= maxGrams) portions.push(g);
     }
   } else {
-    // 5g increments
-    for (let size = 5; size <= maxGrams; size += 5) {
+    // Step size chosen so we get at most 8 options, rounded to nearest 25g
+    const step = Math.max(25, Math.ceil(maxGrams / 8 / 25) * 25);
+    for (let size = step; size <= maxGrams; size += step) {
       portions.push(size);
     }
   }
@@ -130,7 +132,7 @@ function generateFromItems(
   // Try combinations of portions (limit iterations)
   const indices = portionOptions.map(() => 0);
   let iterations = 0;
-  const maxIterations = 200;
+  const maxIterations = 1000;
 
   while (iterations < maxIterations) {
     const mealItems: MealItem[] = items.map((a, idx) => ({
