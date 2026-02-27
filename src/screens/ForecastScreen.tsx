@@ -41,13 +41,34 @@ export function ForecastScreen() {
     <div className="p-4 pb-24 max-w-lg mx-auto">
       <h1 className="mb-4">Tomorrow Forecast</h1>
 
-      <div className="px-card p-4 mb-4" style={{ borderColor: tierBorderColor }}>
+      <h2 className="px-label mb-3">Overall Status</h2>
+      <div className="px-card p-4 mb-4" style={{ borderColor: tierBorderColor, borderWidth: '1px' }}>
         <div className="flex items-center gap-2 mb-2">
           <TierBadge tier={forecast.tier} />
-          <span className="px-label">Overall Status</span>
         </div>
         <p className="tx-body">{tierMessages[forecast.tier]}</p>
       </div>
+
+      {forecast.shoppingNeeded.length > 0 && (
+        <>
+          <h2 className="px-label mb-3">Shopping Suggestions</h2>
+          <div className="space-y-2 mb-6">
+            {forecast.shoppingNeeded.map((suggestion, idx) => (
+              <div key={idx} className="px-card p-3" style={{ borderColor: '#ffd700', borderWidth: '1px' }}>
+                <div className="flex items-center gap-2 mb-1">
+                  <span className="neon-yellow">
+                    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L3.34 16.5c-.77.833.192 2.5 1.732 2.5z" />
+                    </svg>
+                  </span>
+                  <span className="px-label neon-yellow">{suggestion.reason}</span>
+                </div>
+                <p className="tx-body">{suggestion.message}</p>
+              </div>
+            ))}
+          </div>
+        </>
+      )}
 
       <h2 className="px-label mb-3">Simulated Meals ({forecast.meals.length}/3)</h2>
 
@@ -81,29 +102,6 @@ export function ForecastScreen() {
           </div>
         ))}
       </div>
-
-      {forecast.shoppingNeeded.length > 0 && (
-        <>
-          <h2 className="px-label mb-3">Shopping Suggestions</h2>
-          <div className="space-y-2">
-            {forecast.shoppingNeeded.map((suggestion, idx) => (
-              <div key={idx} className="px-card p-3" style={{ borderColor: '#ffd700' }}>
-                <div className="flex items-start gap-2">
-                  <span className="neon-yellow mt-0.5">
-                    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L3.34 16.5c-.77.833.192 2.5 1.732 2.5z" />
-                    </svg>
-                  </span>
-                  <div>
-                    <span className="px-label neon-yellow">{suggestion.reason}</span>
-                    <p className="tx-body mt-0.5">{suggestion.message}</p>
-                  </div>
-                </div>
-              </div>
-            ))}
-          </div>
-        </>
-      )}
     </div>
   );
 }

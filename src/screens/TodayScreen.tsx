@@ -182,7 +182,13 @@ export function TodayScreen() {
       {showManualEntry && (
         <AddManualMealModal
           products={productMap}
-          idealMacros={remaining ? getIdealMealMacros(remaining, mealsLeft) : null}
+          idealMacros={settings ? {
+            kcal:        Math.round(settings.dailyKcal    / settings.mealsPerDay),
+            protein:     Math.round(settings.dailyProtein / settings.mealsPerDay * 10) / 10,
+            fat:         Math.round(settings.dailyFat     / settings.mealsPerDay * 10) / 10,
+            carbs:       Math.round(settings.dailyCarbs   / settings.mealsPerDay * 10) / 10,
+            simpleCarbs: 0,
+          } : null}
           onLog={handleLogManualMeal}
           onClose={() => setShowManualEntry(false)}
         />

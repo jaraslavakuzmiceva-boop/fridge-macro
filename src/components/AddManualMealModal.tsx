@@ -3,12 +3,10 @@ import { calcItemMacros } from '../logic/macroCalculator';
 import type { MacroTotals } from '../logic/macroCalculator';
 import type { Product, MealItem } from '../models/types';
 
-function macroColor(actual: number, ideal: number | undefined): string {
-  if (!ideal || ideal <= 0) return '';
-  const dev = Math.abs(actual - ideal) / ideal;
-  if (dev <= 0.10) return 'neon-green';
-  if (dev <= 0.20) return 'neon-yellow';
-  return 'neon-red';
+function macroColor(key: 'kcal' | 'protein' | 'fat' | 'carbs', actual: number, goal: number | undefined): string {
+  if (!goal || goal <= 0) return '';
+  if (key === 'protein') return actual > goal ? 'neon-green' : '';
+  return actual > goal ? 'neon-red' : '';
 }
 
 type SpeechRecognitionLike = {
@@ -446,6 +444,57 @@ export function AddManualMealModal({ products, idealMacros, onLog, onClose }: Pr
   const [showManualRow, setShowManualRow] = useState(false);
   const [showSpeech, setShowSpeech] = useState(false);
 
+  // ── Inline edit state ──
+  const [editingIdx, setEditingIdx] = useState<number | null>(null);
+  const [editSearch, setEditSearch] = useState('');
+  const [editProductId, setEditProductId] = useState<number | ''>('');
+  const [editQty, setEditQty] = useState('');
+  const [editUnit, setEditUnit] = useState<'g' | 'ml' | 'pieces'>('g');
+  const [editShowDropdown, setEditShowDropdown] = useState(false);
+
+  const editFilteredProducts = useMemo(() => {
+    const q = editSearch.trim();
+    if (!q) return productList;
+    const scored = productList
+      .map(p => ({ p, score: fuzzyScore(p.name, q) }))
+      .filter(x => x.score > 0)
+      .sort((a, b) => b.score - a.score || a.p.name.localeCompare(b.p.name));
+    return scored.map(x => x.p);
+  }, [productList, editSearch]);
+
+  const editProduct = editProductId !== '' ? products.get(editProductId as number) : undefined;
+  const editPreview = useMemo(() => {
+    if (!editProduct) return null;
+    const qty = parseFloat(editQty);
+    if (isNaN(qty) || qty <= 0) return null;
+    return calcItemMacros({ productId: editProduct.id!, quantity: qty, unit: editUnit }, editProduct);
+  }, [editProduct, editQty, editUnit]);
+
+  function startEdit(idx: number) {
+    const e = entries[idx];
+    const p = products.get(e.productId);
+    setEditingIdx(idx);
+    setEditSearch(p?.name ?? '');
+    setEditProductId(e.productId);
+    setEditQty(e.quantity);
+    setEditUnit(e.unit);
+    setEditShowDropdown(false);
+  }
+
+  function saveEdit() {
+    if (editingIdx === null || editProductId === '') return;
+    const qty = parseFloat(editQty);
+    if (isNaN(qty) || qty <= 0) return;
+    setEntries(prev => prev.map((e, i) =>
+      i === editingIdx ? { productId: editProductId as number, quantity: editQty, unit: editUnit } : e
+    ));
+    setEditingIdx(null);
+  }
+
+  function cancelEdit() {
+    setEditingIdx(null);
+  }
+
   return (
     <div className="fixed inset-0 bg-black/70 z-50 flex items-end sm:items-center justify-center">
       <div className="px-card w-full sm:max-w-lg p-5 max-h-[90vh] flex flex-col">
@@ -461,16 +510,16 @@ export function AddManualMealModal({ products, idealMacros, onLog, onClose }: Pr
             <div className="px-card p-4">
               <p className="px-label mb-2">Meal Total</p>
               <div className="grid grid-cols-4 gap-2 text-center">
-                {[
-                  { label: 'Calories', value: totals.kcal,     ideal: idealMacros?.kcal,     unit: 'kcal' },
-                  { label: 'Protein',  value: totals.protein,  ideal: idealMacros?.protein,  unit: 'g' },
-                  { label: 'Fat',      value: totals.fat,      ideal: idealMacros?.fat,       unit: 'g' },
-                  { label: 'Carbs',    value: totals.carbs,    ideal: idealMacros?.carbs,     unit: 'g' },
-                ].map(({ label, value, ideal, unit: u }) => (
+                {([
+                  { key: 'kcal'    as const, label: 'Calories', value: totals.kcal,    ideal: idealMacros?.kcal,    unit: 'kcal' },
+                  { key: 'protein' as const, label: 'Protein',  value: totals.protein, ideal: idealMacros?.protein, unit: 'g' },
+                  { key: 'fat'     as const, label: 'Fat',      value: totals.fat,     ideal: idealMacros?.fat,     unit: 'g' },
+                  { key: 'carbs'   as const, label: 'Carbs',    value: totals.carbs,   ideal: idealMacros?.carbs,   unit: 'g' },
+                ]).map(({ key, label, value, ideal, unit: u }) => (
                   <div key={label} className="px-card p-2">
                     <p className="px-label">{label}</p>
-                    <p className={`tx-value mt-1 ${macroColor(value, ideal)}`}>{value}</p>
-                    <p className="px-label mt-0.5">{u}</p>
+                    <p className={`tx-value mt-1 ${macroColor(key, value, ideal)}`}>{value}</p>
+                    <p className="tx-meta mt-0.5">{u}{ideal ? ` / ${ideal}` : ''}</p>
                   </div>
                 ))}
               </div>
@@ -485,6 +534,83 @@ export function AddManualMealModal({ products, idealMacros, onLog, onClose }: Pr
                 const p = products.get(e.productId);
                 const qty = parseFloat(e.quantity);
                 const m = p && !isNaN(qty) ? calcItemMacros({ productId: e.productId, quantity: qty, unit: e.unit }, p) : null;
+
+                if (editingIdx === idx) {
+                  return (
+                    <div key={idx} className="px-card p-3 space-y-2">
+                      {/* Product search */}
+                      <div className="relative">
+                        <input
+                          type="text"
+                          value={editSearch}
+                          onChange={e => { setEditSearch(e.target.value); setEditProductId(''); setEditShowDropdown(true); }}
+                          onFocus={() => setEditShowDropdown(true)}
+                          className="px-input tx-body"
+                          placeholder="Search product..."
+                          autoFocus
+                        />
+                        {editShowDropdown && editFilteredProducts.length > 0 && (
+                          <div className="absolute z-10 w-full mt-1 px-card max-h-40 overflow-y-auto" style={{ top: '100%' }}>
+                            {editFilteredProducts.map(prod => (
+                              <button
+                                key={prod.id}
+                                onMouseDown={() => {
+                                  setEditProductId(prod.id!);
+                                  setEditSearch(prod.name);
+                                  setEditUnit(prod.defaultUnit);
+                                  setEditShowDropdown(false);
+                                }}
+                                className="w-full text-left px-3 py-2 tx-body hover:bg-gray-100"
+                                style={{ display: 'block' }}
+                              >
+                                {prod.name}
+                                <span className="ml-1 px-label">({prod.kcalPer100} kcal/100{prod.defaultUnit === 'pieces' ? 'pc' : prod.defaultUnit})</span>
+                              </button>
+                            ))}
+                          </div>
+                        )}
+                      </div>
+                      {/* Qty + unit */}
+                      <div className="flex gap-2">
+                        <input
+                          type="number"
+                          min="0"
+                          step="1"
+                          value={editQty}
+                          onChange={e => setEditQty(e.target.value)}
+                          className="px-input flex-1"
+                          style={{ width: 'auto' }}
+                        />
+                        <select
+                          value={editUnit}
+                          onChange={e => setEditUnit(e.target.value as 'g' | 'ml' | 'pieces')}
+                          className="px-input"
+                          style={{ width: 'auto' }}
+                        >
+                          <option value="g">g</option>
+                          <option value="ml">ml</option>
+                          <option value="pieces">pcs</option>
+                        </select>
+                      </div>
+                      {editPreview && (
+                        <p className="px-label neon-green">
+                          {editPreview.kcal} kcal · P {editPreview.protein}g · F {editPreview.fat}g · C {editPreview.carbs}g
+                        </p>
+                      )}
+                      <div className="flex gap-2">
+                        <button onClick={cancelEdit} className="px-btn-outline flex-1">Cancel</button>
+                        <button
+                          onClick={saveEdit}
+                          disabled={editProductId === '' || !editQty || parseFloat(editQty) <= 0}
+                          className="px-btn flex-1"
+                        >
+                          Save
+                        </button>
+                      </div>
+                    </div>
+                  );
+                }
+
                 return (
                   <div key={idx} className="px-card flex items-start justify-between p-3">
                     <div className="flex-1 min-w-0">
@@ -496,9 +622,10 @@ export function AddManualMealModal({ products, idealMacros, onLog, onClose }: Pr
                         </p>
                       )}
                     </div>
-                    <button onClick={() => handleRemoveEntry(idx)} className="px-btn-text danger ml-2 shrink-0">
-                      Remove
-                    </button>
+                    <div className="flex gap-1 ml-2 shrink-0">
+                      <button onClick={() => startEdit(idx)} className="px-btn-text">Edit</button>
+                      <button onClick={() => handleRemoveEntry(idx)} className="px-btn-text danger">Remove</button>
+                    </div>
                   </div>
                 );
               })}
