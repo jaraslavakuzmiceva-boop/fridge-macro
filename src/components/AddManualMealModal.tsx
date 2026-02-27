@@ -514,7 +514,7 @@ export function AddManualMealModal({ products, onLog, onClose }: Props) {
                   setShowSpeech(false);
                 }
               }}
-              className={`flex items-center gap-2 px-3 py-2 rounded-lg text-sm font-semibold transition-colors ${
+              className={`w-full flex items-center justify-center gap-2 px-3 py-2 rounded-lg text-sm font-semibold transition-colors ${
                 showSpeech
                   ? 'bg-emerald-600 text-white'
                   : 'bg-white border border-gray-200 text-gray-600 hover:bg-emerald-50'
