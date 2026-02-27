@@ -353,6 +353,7 @@ export function AddManualMealModal({ products, onLog, onClose }: Props) {
     setQuantity('100');
     setUnit('g');
     setSearch('');
+    setShowManualRow(false);
   }
 
   function handleRemoveEntry(idx: number) {
@@ -403,6 +404,7 @@ export function AddManualMealModal({ products, onLog, onClose }: Props) {
   }, [selectedProduct, quantity, unit]);
 
   const [showDropdown, setShowDropdown] = useState(false);
+  const [showManualRow, setShowManualRow] = useState(false);
 
   return (
     <div className="fixed inset-0 bg-black/50 z-50 flex items-end sm:items-center justify-center">
@@ -545,42 +547,54 @@ export function AddManualMealModal({ products, onLog, onClose }: Props) {
               </button>
             </div>
 
-            {/* Quantity + unit */}
-            <div className="flex gap-2">
-              <input
-                type="number"
-                min="0"
-                step="1"
-                placeholder="Amount"
-                value={quantity}
-                onChange={e => setQuantity(e.target.value)}
-                className="flex-1 border border-gray-200 rounded-lg px-3 py-2 text-sm bg-white focus:outline-none focus:ring-2 focus:ring-emerald-400"
-              />
-              <select
-                value={unit}
-                onChange={e => setUnit(e.target.value as 'g' | 'ml' | 'pieces')}
-                className="border border-gray-200 rounded-lg px-3 py-2 text-sm bg-white focus:outline-none focus:ring-2 focus:ring-emerald-400"
+            {/* Quantity + unit (collapsed by default) */}
+            {!showManualRow ? (
+              <button
+                type="button"
+                onClick={() => setShowManualRow(true)}
+                className="w-full py-2 border border-dashed border-emerald-300 text-emerald-600 rounded-lg text-sm font-semibold hover:bg-emerald-50 transition-colors"
               >
-                <option value="g">g</option>
-                <option value="ml">ml</option>
-                <option value="pieces">pcs</option>
-              </select>
-            </div>
+                Add +
+              </button>
+            ) : (
+              <>
+                <div className="flex gap-2">
+                  <input
+                    type="number"
+                    min="0"
+                    step="1"
+                    placeholder="Amount"
+                    value={quantity}
+                    onChange={e => setQuantity(e.target.value)}
+                    className="flex-1 border border-gray-200 rounded-lg px-3 py-2 text-sm bg-white focus:outline-none focus:ring-2 focus:ring-emerald-400"
+                    autoFocus
+                  />
+                  <select
+                    value={unit}
+                    onChange={e => setUnit(e.target.value as 'g' | 'ml' | 'pieces')}
+                    className="border border-gray-200 rounded-lg px-3 py-2 text-sm bg-white focus:outline-none focus:ring-2 focus:ring-emerald-400"
+                  >
+                    <option value="g">g</option>
+                    <option value="ml">ml</option>
+                    <option value="pieces">pcs</option>
+                  </select>
+                </div>
 
-            {/* Row macro preview */}
-            {rowPreview && (
-              <p className="text-xs text-emerald-700 bg-emerald-50 rounded-lg px-3 py-2">
-                {rowPreview.kcal} kcal · Protein {rowPreview.protein}g · Fat {rowPreview.fat}g · Carbs {rowPreview.carbs}g
-              </p>
+                {rowPreview && (
+                  <p className="text-xs text-emerald-700 bg-emerald-50 rounded-lg px-3 py-2">
+                    {rowPreview.kcal} kcal · Protein {rowPreview.protein}g · Fat {rowPreview.fat}g · Carbs {rowPreview.carbs}g
+                  </p>
+                )}
+
+                <button
+                  onClick={handleAddEntry}
+                  disabled={selectedProductId === '' || !quantity || parseFloat(quantity) <= 0}
+                  className="w-full py-2 bg-emerald-500 disabled:bg-gray-200 disabled:text-gray-400 text-white rounded-lg text-sm font-semibold hover:bg-emerald-600 transition-colors"
+                >
+                  + Add to Meal
+                </button>
+              </>
             )}
-
-            <button
-              onClick={handleAddEntry}
-              disabled={selectedProductId === '' || !quantity || parseFloat(quantity) <= 0}
-              className="w-full py-2 bg-emerald-500 disabled:bg-gray-200 disabled:text-gray-400 text-white rounded-lg text-sm font-semibold hover:bg-emerald-600 transition-colors"
-            >
-              + Add to Meal
-            </button>
           </div>
 
           {/* Totals */}
