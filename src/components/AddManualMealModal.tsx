@@ -439,7 +439,7 @@ export function AddManualMealModal({ products, onLog, onClose }: Props) {
 
   return (
     <div className="fixed inset-0 bg-black/50 z-50 flex items-end sm:items-center justify-center">
-      <div className="bg-black w-full sm:max-w-lg rounded-t-2xl sm:rounded-2xl p-5 max-h-[90vh] flex flex-col">
+      <div className="bg-black w-full sm:max-w-lg rounded-t-2xl sm:rounded-2xl p-5 max-h-[90vh] flex flex-col border border-emerald-500 shadow-[0_0_0_1px_rgba(16,185,129,0.35)]">
         {/* Header */}
         <div className="flex justify-between items-center mb-4">
           <h2 className="text-lg font-bold text-white">Add Meal Manually</h2>
@@ -664,7 +664,7 @@ export function AddManualMealModal({ products, onLog, onClose }: Props) {
           <button
             onClick={handleLog}
             disabled={entries.length === 0}
-            className="flex-1 py-3 rounded-xl bg-emerald-500 disabled:bg-black disabled:text-emerald-400 text-black text-sm font-semibold hover:bg-emerald-400 transition-colors"
+            className="flex-1 py-3 rounded-xl bg-emerald-500 text-black text-sm font-semibold hover:bg-emerald-400 transition-colors shadow-sm disabled:opacity-50"
           >
             Log Meal
           </button>

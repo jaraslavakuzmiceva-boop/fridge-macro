@@ -41,7 +41,7 @@ export function MealSuggestionModal({ candidates, products, idealMacros, onAccep
   if (candidates.length === 0) {
     return (
       <div className="fixed inset-0 bg-black/70 flex items-end sm:items-center justify-center z-50 p-4">
-        <div className="bg-black rounded-t-2xl sm:rounded-2xl w-full max-w-md p-6 border border-emerald-900/40 shadow-[0_0_0_1px_rgba(16,185,129,0.08)]">
+        <div className="bg-black rounded-t-2xl sm:rounded-2xl w-full max-w-md p-6 border border-emerald-500 shadow-[0_0_0_1px_rgba(16,185,129,0.35)]">
           <h3 className="text-lg font-semibold text-white mb-2">No Meal Suggestions</h3>
           <p className="text-emerald-300 text-sm mb-4">
             Not enough inventory to generate meal suggestions. Add more items to your fridge!
@@ -74,7 +74,7 @@ export function MealSuggestionModal({ candidates, products, idealMacros, onAccep
 
   return (
     <div className="fixed inset-0 bg-black/70 flex items-end sm:items-center justify-center z-50 p-4">
-      <div className="bg-black rounded-t-2xl sm:rounded-2xl w-full max-w-md p-6 max-h-[80vh] overflow-y-auto border border-emerald-900/40 shadow-[0_0_0_1px_rgba(16,185,129,0.08)]">
+      <div className="bg-black rounded-t-2xl sm:rounded-2xl w-full max-w-md p-6 max-h-[80vh] overflow-y-auto border border-emerald-500 shadow-[0_0_0_1px_rgba(16,185,129,0.35)]">
         <div className="flex justify-between items-center mb-4">
           <h3 className="text-lg font-semibold text-white">Meal Suggestions</h3>
           <button onClick={onClose} className="text-emerald-400 hover:text-emerald-200 text-xl">&times;</button>

@@ -143,7 +143,7 @@ function AddEditModal({
 
   return (
     <div className="fixed inset-0 bg-black/50 flex items-end sm:items-center justify-center z-50 p-4">
-      <form onSubmit={handleSubmit} className="bg-black rounded-t-2xl sm:rounded-2xl w-full max-w-md p-6">
+      <form onSubmit={handleSubmit} className="bg-black rounded-t-2xl sm:rounded-2xl w-full max-w-md p-6 border border-emerald-500 shadow-[0_0_0_1px_rgba(16,185,129,0.35)]">
         <div className="flex justify-between items-center mb-4">
           <h3 className="text-lg font-semibold text-white">
             {editItem ? 'Edit Item' : 'Add Item'}
