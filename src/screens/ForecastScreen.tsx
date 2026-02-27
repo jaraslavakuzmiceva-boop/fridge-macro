@@ -10,11 +10,11 @@ import type { Product } from '../models/types';
 export function ForecastScreen() {
   const { settings } = useSettings();
   const { items: inventory } = useInventory();
-  const allProducts = useLiveQuery(() => db.products.toArray()) ?? [];
+  const allProducts = useLiveQuery(() => db.products.toArray());
 
   const productMap = useMemo(() => {
     const map = new Map<number, Product>();
-    for (const p of allProducts) map.set(p.id!, p);
+    for (const p of allProducts ?? []) map.set(p.id!, p);
     return map;
   }, [allProducts]);
 
@@ -23,12 +23,12 @@ export function ForecastScreen() {
     return generateForecast(inventory, productMap, settings);
   }, [inventory, productMap, settings]);
 
-  if (!settings || !forecast) return <div className="p-4 text-gray-500">Loading...</div>;
+  if (!settings || !forecast) return <div className="p-4 text-emerald-300">Loading...</div>;
 
   const tierColors = {
-    green: 'border-green-500 bg-green-50',
-    yellow: 'border-yellow-400 bg-yellow-50',
-    red: 'border-red-500 bg-red-50',
+    green: 'border-emerald-500 bg-black',
+    yellow: 'border-emerald-600 bg-black',
+    red: 'border-emerald-800 bg-black',
   };
 
   const tierMessages = {
@@ -39,42 +39,42 @@ export function ForecastScreen() {
 
   return (
     <div className="p-4 pb-24 max-w-lg mx-auto">
-      <h1 className="text-xl font-bold text-gray-800 mb-4">Tomorrow Forecast</h1>
+      <h1 className="text-xl font-bold text-white mb-4">Tomorrow Forecast</h1>
 
       <div className={`p-4 rounded-xl border-2 mb-4 ${tierColors[forecast.tier]}`}>
         <div className="flex items-center gap-2 mb-2">
           <TierBadge tier={forecast.tier} />
-          <span className="text-sm font-medium text-gray-700">Overall Status</span>
+          <span className="text-sm font-medium text-emerald-200">Overall Status</span>
         </div>
-        <p className="text-sm text-gray-600">{tierMessages[forecast.tier]}</p>
+        <p className="text-sm text-emerald-300">{tierMessages[forecast.tier]}</p>
       </div>
 
-      <h2 className="text-sm font-semibold text-gray-500 uppercase tracking-wide mb-3">
+      <h2 className="text-sm font-semibold text-emerald-300 uppercase tracking-wide mb-3">
         Simulated Meals ({forecast.meals.length}/3)
       </h2>
 
       {forecast.meals.length === 0 && (
-        <p className="text-sm text-gray-400 mb-4">No meals could be generated from tomorrow's inventory.</p>
+        <p className="text-sm text-emerald-400 mb-4">No meals could be generated from tomorrow's inventory.</p>
       )}
 
       <div className="space-y-3 mb-6">
         {forecast.meals.map((meal, idx) => (
-          <div key={idx} className="p-3 bg-white rounded-lg shadow-sm border border-gray-100">
+          <div key={idx} className="p-3 bg-black rounded-lg shadow-sm border border-emerald-900/40">
             <div className="flex items-center gap-2 mb-2">
-              <span className="text-sm font-medium text-gray-700">Meal {idx + 1}</span>
+              <span className="text-sm font-medium text-emerald-200">Meal {idx + 1}</span>
               <TierBadge tier={meal.tier} />
             </div>
             <div className="space-y-1 mb-2">
               {meal.items.map((item, i) => {
                 const product = productMap.get(item.productId);
                 return (
-                  <div key={i} className="text-sm text-gray-600">
+                  <div key={i} className="text-sm text-emerald-300">
                     {product?.name ?? 'Unknown'} — {item.quantity} {item.unit}
                   </div>
                 );
               })}
             </div>
-            <div className="flex gap-3 text-xs text-gray-500">
+            <div className="flex gap-3 text-xs text-emerald-300">
               <span>{meal.totalKcal} kcal</span>
               <span>P: {meal.totalProtein}g</span>
               <span>F: {meal.totalFat}g</span>
@@ -86,21 +86,21 @@ export function ForecastScreen() {
 
       {forecast.shoppingNeeded.length > 0 && (
         <>
-          <h2 className="text-sm font-semibold text-gray-500 uppercase tracking-wide mb-3">
+          <h2 className="text-sm font-semibold text-emerald-300 uppercase tracking-wide mb-3">
             Shopping Suggestions
           </h2>
           <div className="space-y-2">
             {forecast.shoppingNeeded.map((suggestion, idx) => (
-              <div key={idx} className="p-3 bg-amber-50 border border-amber-200 rounded-lg">
+              <div key={idx} className="p-3 bg-black border border-emerald-900/40 rounded-lg">
                 <div className="flex items-start gap-2">
-                  <span className="text-amber-500 mt-0.5">
+                  <span className="text-emerald-400 mt-0.5">
                     <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L3.34 16.5c-.77.833.192 2.5 1.732 2.5z" />
                     </svg>
                   </span>
                   <div>
-                    <span className="text-xs text-amber-700 font-medium uppercase">{suggestion.reason}</span>
-                    <p className="text-sm text-gray-700">{suggestion.message}</p>
+                    <span className="text-xs text-emerald-300 font-medium uppercase">{suggestion.reason}</span>
+                    <p className="text-sm text-emerald-200">{suggestion.message}</p>
                   </div>
                 </div>
               </div>

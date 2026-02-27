@@ -28,10 +28,10 @@ export function TodayScreen() {
     setTimeout(() => setToast(null), 2500);
   }
 
-  const allProducts = useLiveQuery(() => db.products.toArray()) ?? [];
+  const allProducts = useLiveQuery(() => db.products.toArray());
   const productMap = useMemo(() => {
     const map = new Map<number, Product>();
-    for (const p of allProducts) map.set(p.id!, p);
+    for (const p of allProducts ?? []) map.set(p.id!, p);
     return map;
   }, [allProducts]);
 
@@ -105,30 +105,30 @@ export function TodayScreen() {
     }, 400);
   }
 
-  if (!settings) return <div className="p-4 text-gray-500">Loading...</div>;
+  if (!settings) return <div className="p-4 text-emerald-400">Loading...</div>;
 
   const simpleCarbPct = consumed.kcal > 0
     ? ((consumed.simpleCarbs * 4) / consumed.kcal * 100)
     : 0;
 
   return (
-    <div className="p-4 pb-24 max-w-lg mx-auto">
+    <div className="p-4 pb-24 max-w-lg mx-auto bg-black min-h-screen text-white">
       {toast && (
-        <div className="fixed top-4 left-1/2 -translate-x-1/2 z-50 bg-gray-800 text-white text-sm font-medium px-4 py-2.5 rounded-xl shadow-lg animate-fade-in">
+        <div className="fixed top-4 left-1/2 -translate-x-1/2 z-50 bg-black text-emerald-200 text-sm font-medium px-4 py-2.5 rounded-xl border border-emerald-800 shadow-[0_0_0_1px_rgba(16,185,129,0.1)] animate-fade-in">
           {toast}
         </div>
       )}
-      <h1 className="text-xl font-bold text-gray-800 mb-4">Today</h1>
+      <h1 className="text-xl font-bold text-white mb-4">Today</h1>
 
-      <div className="bg-white rounded-xl p-4 shadow-sm border border-gray-100 mb-4">
+      <div className="bg-black rounded-xl p-4 border border-emerald-900/40 shadow-[0_0_0_1px_rgba(16,185,129,0.08)] mb-4">
         <MacroBar label="Calories" current={consumed.kcal} target={settings.dailyKcal} unit="kcal" />
         <MacroBar label="Protein" current={consumed.protein} target={settings.dailyProtein} unit="g" />
         <MacroBar label="Fat" current={consumed.fat} target={settings.dailyFat} unit="g" />
         <MacroBar label="Carbs" current={consumed.carbs} target={settings.dailyCarbs} unit="g" />
 
         <div className="mt-2 flex items-center gap-2">
-          <span className="text-xs text-gray-500">Simple carbs:</span>
-          <span className={`text-xs font-medium ${simpleCarbPct > settings.simpleCarbLimitPercent ? 'text-red-600' : 'text-gray-600'}`}>
+          <span className="text-xs text-emerald-400">Simple carbs:</span>
+          <span className={`text-xs font-medium ${simpleCarbPct > settings.simpleCarbLimitPercent ? 'text-emerald-300' : 'text-emerald-400'}`}>
             {simpleCarbPct.toFixed(1)}% of kcal
             {simpleCarbPct > settings.simpleCarbLimitPercent && ' (over limit!)'}
           </span>
@@ -139,7 +139,7 @@ export function TodayScreen() {
         <button
           onClick={handleGenerateMeal}
           disabled={isGenerating}
-          className="flex-1 py-3 bg-emerald-500 text-white rounded-xl font-semibold text-base hover:bg-emerald-600 transition-colors shadow-sm disabled:opacity-70 flex items-center justify-center gap-2"
+          className="flex-1 py-3 bg-black text-emerald-300 border border-emerald-700 rounded-xl font-semibold text-base hover:bg-emerald-900/30 transition-colors shadow-sm disabled:opacity-50 flex items-center justify-center gap-2"
         >
           {isGenerating ? (
             <>
@@ -153,18 +153,18 @@ export function TodayScreen() {
         </button>
         <button
           onClick={() => setShowManualEntry(true)}
-          className="flex-1 py-3 bg-white text-emerald-600 border border-emerald-400 rounded-xl font-semibold text-base hover:bg-emerald-50 transition-colors shadow-sm"
+          className="flex-1 py-3 bg-black text-emerald-300 border border-emerald-700 rounded-xl font-semibold text-base hover:bg-emerald-900/30 transition-colors shadow-sm"
         >
           Add Meal Manually
         </button>
       </div>
 
       <div className="space-y-3">
-        <h2 className="text-sm font-semibold text-gray-500 uppercase tracking-wide">
+        <h2 className="text-sm font-semibold text-emerald-300 uppercase tracking-wide">
           Today's Meals ({todayMeals.length})
         </h2>
         {todayMeals.length === 0 && (
-          <p className="text-sm text-gray-400">No meals logged yet. Generate your first meal!</p>
+          <p className="text-sm text-emerald-400">No meals logged yet. Generate your first meal!</p>
         )}
         {todayMeals.map(meal => (
           <MealCard key={meal.id} meal={meal} products={productMap} onDelete={deleteMeal} />

@@ -46,7 +46,7 @@ const navItems = [
 
 export function App() {
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-black text-white">
       <Routes>
         <Route path="/" element={<TodayScreen />} />
         <Route path="/inventory" element={<InventoryScreen />} />
@@ -56,7 +56,7 @@ export function App() {
         <Route path="*" element={<Navigate to="/" replace />} />
       </Routes>
 
-      <nav className="fixed bottom-0 left-0 right-0 bg-white border-t border-gray-200 safe-area-bottom">
+      <nav className="fixed bottom-0 left-0 right-0 bg-black border-t border-emerald-900/50 safe-area-bottom">
         <div className="max-w-lg mx-auto flex justify-around">
           {navItems.map(item => (
             <NavLink
@@ -65,7 +65,7 @@ export function App() {
               end={item.to === '/'}
               className={({ isActive }) =>
                 `flex flex-col items-center py-2 px-3 text-xs transition-colors ${
-                  isActive ? 'text-emerald-600' : 'text-gray-400'
+                  isActive ? 'text-emerald-300' : 'text-emerald-500'
                 }`
               }
             >

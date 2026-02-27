@@ -439,18 +439,18 @@ export function AddManualMealModal({ products, onLog, onClose }: Props) {
 
   return (
     <div className="fixed inset-0 bg-black/50 z-50 flex items-end sm:items-center justify-center">
-      <div className="bg-white w-full sm:max-w-lg rounded-t-2xl sm:rounded-2xl p-5 max-h-[90vh] flex flex-col">
+      <div className="bg-black w-full sm:max-w-lg rounded-t-2xl sm:rounded-2xl p-5 max-h-[90vh] flex flex-col">
         {/* Header */}
         <div className="flex justify-between items-center mb-4">
-          <h2 className="text-lg font-bold text-gray-800">Add Meal Manually</h2>
-          <button onClick={onClose} className="text-gray-400 hover:text-gray-600 text-xl leading-none">✕</button>
+          <h2 className="text-lg font-bold text-white">Add Meal Manually</h2>
+          <button onClick={onClose} className="text-emerald-400 hover:text-emerald-300 text-xl leading-none">✕</button>
         </div>
 
         <div className="flex-1 overflow-y-auto space-y-4">
           {/* Totals */}
           {entries.length > 0 && (
-            <div className="bg-emerald-50 rounded-xl p-4">
-              <p className="text-xs font-semibold text-emerald-700 uppercase tracking-wide mb-2">Meal Total</p>
+            <div className="bg-black rounded-xl p-4">
+              <p className="text-xs font-semibold text-emerald-300 uppercase tracking-wide mb-2">Meal Total</p>
               <div className="grid grid-cols-4 gap-2 text-center">
                 {[
                   { label: 'Calories', value: `${totals.kcal}`, unit: 'kcal' },
@@ -458,10 +458,10 @@ export function AddManualMealModal({ products, onLog, onClose }: Props) {
                   { label: 'Fat', value: `${totals.fat}`, unit: 'g' },
                   { label: 'Carbs', value: `${totals.carbs}`, unit: 'g' },
                 ].map(({ label, value, unit: u }) => (
-                  <div key={label} className="bg-white rounded-lg p-2">
-                    <p className="text-xs text-gray-500">{label}</p>
-                    <p className="text-sm font-bold text-gray-800">{value}</p>
-                    <p className="text-xs text-gray-400">{u}</p>
+                  <div key={label} className="bg-black rounded-lg p-2 border border-emerald-900/40">
+                    <p className="text-xs text-emerald-300">{label}</p>
+                    <p className="text-sm font-bold text-white">{value}</p>
+                    <p className="text-xs text-emerald-400">{u}</p>
                   </div>
                 ))}
               </div>
@@ -471,25 +471,25 @@ export function AddManualMealModal({ products, onLog, onClose }: Props) {
           {/* Added items */}
           {entries.length > 0 && (
             <div className="space-y-2">
-              <p className="text-xs font-semibold text-gray-500 uppercase tracking-wide">Items</p>
+              <p className="text-xs font-semibold text-emerald-300 uppercase tracking-wide">Items</p>
               {entries.map((e, idx) => {
                 const p = products.get(e.productId);
                 const qty = parseFloat(e.quantity);
                 const m = p && !isNaN(qty) ? calcItemMacros({ productId: e.productId, quantity: qty, unit: e.unit }, p) : null;
                 return (
-                  <div key={idx} className="flex items-start justify-between bg-gray-50 rounded-lg p-3">
+                  <div key={idx} className="flex items-start justify-between bg-black rounded-lg p-3">
                     <div className="flex-1 min-w-0">
-                      <p className="text-sm font-medium text-gray-800 truncate">{p?.name ?? 'Unknown'}</p>
-                      <p className="text-xs text-gray-500">{e.quantity} {e.unit}</p>
+                      <p className="text-sm font-medium text-white truncate">{p?.name ?? 'Unknown'}</p>
+                      <p className="text-xs text-emerald-300">{e.quantity} {e.unit}</p>
                       {m && (
-                        <p className="text-xs text-gray-400 mt-0.5">
+                        <p className="text-xs text-emerald-400 mt-0.5">
                           {m.kcal} kcal · P {m.protein}g · F {m.fat}g · C {m.carbs}g
                         </p>
                       )}
                     </div>
                     <button
                       onClick={() => handleRemoveEntry(idx)}
-                      className="ml-2 text-gray-300 hover:text-red-500 text-xs shrink-0 pt-0.5"
+                      className="ml-2 text-emerald-400 hover:text-emerald-200 text-xs shrink-0 pt-0.5"
                     >
                       Remove
                     </button>
@@ -500,7 +500,7 @@ export function AddManualMealModal({ products, onLog, onClose }: Props) {
           )}
 
           {/* Add product row */}
-          <div className="bg-gray-50 rounded-xl p-4 space-y-3">
+          <div className="bg-black rounded-xl p-4 space-y-3">
 
             {/* 1. Speech to text */}
             <button
@@ -517,7 +517,7 @@ export function AddManualMealModal({ products, onLog, onClose }: Props) {
               className={`w-full flex items-center justify-center gap-2 px-3 py-2 rounded-lg text-sm font-semibold transition-colors ${
                 showSpeech
                   ? 'bg-emerald-600 text-white'
-                  : 'bg-white border border-gray-200 text-gray-600 hover:bg-emerald-50'
+                  : 'bg-black border border-emerald-900/40 text-emerald-300 hover:bg-black'
               }`}
             >
               <span className="text-base">🎤</span>
@@ -526,12 +526,12 @@ export function AddManualMealModal({ products, onLog, onClose }: Props) {
 
             {showSpeech && (
               <div className="space-y-2">
-                <div className="flex rounded-lg border border-gray-200 overflow-hidden self-start">
+                <div className="flex rounded-lg border border-emerald-900/40 overflow-hidden self-start">
                   <button
                     type="button"
                     onClick={() => setSpeechLang('ru-RU')}
                     className={`px-2 py-2 text-xs font-semibold ${
-                      speechLang === 'ru-RU' ? 'bg-emerald-600 text-white' : 'bg-white text-gray-500'
+                      speechLang === 'ru-RU' ? 'bg-emerald-600 text-white' : 'bg-black text-emerald-300'
                     }`}
                   >
                     RU
@@ -540,27 +540,27 @@ export function AddManualMealModal({ products, onLog, onClose }: Props) {
                     type="button"
                     onClick={() => setSpeechLang('en-US')}
                     className={`px-2 py-2 text-xs font-semibold ${
-                      speechLang === 'en-US' ? 'bg-emerald-600 text-white' : 'bg-white text-gray-500'
+                      speechLang === 'en-US' ? 'bg-emerald-600 text-white' : 'bg-black text-emerald-300'
                     }`}
                   >
                     EN
                   </button>
                 </div>
                 {speechError && (
-                  <p className="text-xs text-red-500">{speechError}</p>
+                  <p className="text-xs text-emerald-400">{speechError}</p>
                 )}
                 <textarea
                   placeholder="Speech transcript will appear here. You can edit before adding."
                   value={transcript}
                   onChange={e => setTranscript(e.target.value)}
-                  className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm bg-white focus:outline-none focus:ring-2 focus:ring-emerald-400"
+                  className="w-full border border-emerald-900/40 rounded-lg px-3 py-2 text-sm bg-black focus:outline-none focus:ring-2 focus:ring-emerald-400"
                   rows={2}
                 />
                 <button
                   type="button"
                   onClick={handleSpeechAdd}
                   disabled={!transcript.trim()}
-                  className="w-full py-2 bg-emerald-500 disabled:bg-gray-200 disabled:text-gray-400 text-white rounded-lg text-sm font-semibold hover:bg-emerald-600 transition-colors"
+                  className="w-full py-2 bg-emerald-500 disabled:bg-black disabled:text-emerald-400 text-black rounded-lg text-sm font-semibold hover:bg-emerald-400 transition-colors"
                 >
                   Add Items From Speech
                 </button>
@@ -568,7 +568,7 @@ export function AddManualMealModal({ products, onLog, onClose }: Props) {
             )}
 
             {/* 2. Product search */}
-            <p className="text-xs font-semibold text-gray-500 uppercase tracking-wide">Add manually</p>
+            <p className="text-xs font-semibold text-emerald-300 uppercase tracking-wide">Add manually</p>
             <div className="relative">
               <input
                 type="text"
@@ -580,10 +580,10 @@ export function AddManualMealModal({ products, onLog, onClose }: Props) {
                   setShowDropdown(true);
                 }}
                 onFocus={() => setShowDropdown(true)}
-                className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm bg-white focus:outline-none focus:ring-2 focus:ring-emerald-400"
+                className="w-full border border-emerald-900/40 rounded-lg px-3 py-2 text-sm bg-black focus:outline-none focus:ring-2 focus:ring-emerald-400"
               />
               {showDropdown && filteredProducts.length > 0 && (
-                <div className="absolute z-10 w-full mt-1 bg-white border border-gray-200 rounded-lg shadow-lg max-h-48 overflow-y-auto">
+                <div className="absolute z-10 w-full mt-1 bg-black border border-emerald-900/40 rounded-lg shadow-lg max-h-48 overflow-y-auto">
                   {filteredProducts.map(p => (
                     <button
                       key={p.id}
@@ -591,10 +591,10 @@ export function AddManualMealModal({ products, onLog, onClose }: Props) {
                         handleProductSelect(p.id!);
                         setShowDropdown(false);
                       }}
-                      className="w-full text-left px-3 py-2 text-sm hover:bg-emerald-50 text-gray-700"
+                      className="w-full text-left px-3 py-2 text-sm hover:bg-black text-emerald-200"
                     >
                       <span className="font-medium">{p.name}</span>
-                      <span className="ml-1 text-gray-400 text-xs">({p.kcalPer100} kcal/100{p.defaultUnit === 'pieces' ? 'pc' : p.defaultUnit})</span>
+                      <span className="ml-1 text-emerald-400 text-xs">({p.kcalPer100} kcal/100{p.defaultUnit === 'pieces' ? 'pc' : p.defaultUnit})</span>
                     </button>
                   ))}
                 </div>
@@ -606,7 +606,7 @@ export function AddManualMealModal({ products, onLog, onClose }: Props) {
               <button
                 type="button"
                 onClick={() => setShowManualRow(true)}
-                className="w-full py-2 border border-dashed border-emerald-300 text-emerald-600 rounded-lg text-sm font-semibold hover:bg-emerald-50 transition-colors"
+                className="w-full py-2 border border-dashed border-emerald-300 text-emerald-300 rounded-lg text-sm font-semibold hover:bg-black transition-colors"
               >
                 Add +
               </button>
@@ -620,13 +620,13 @@ export function AddManualMealModal({ products, onLog, onClose }: Props) {
                     placeholder="Amount"
                     value={quantity}
                     onChange={e => setQuantity(e.target.value)}
-                    className="flex-1 border border-gray-200 rounded-lg px-3 py-2 text-sm bg-white focus:outline-none focus:ring-2 focus:ring-emerald-400"
+                    className="flex-1 border border-emerald-900/40 rounded-lg px-3 py-2 text-sm bg-black focus:outline-none focus:ring-2 focus:ring-emerald-400"
                     autoFocus
                   />
                   <select
                     value={unit}
                     onChange={e => setUnit(e.target.value as 'g' | 'ml' | 'pieces')}
-                    className="border border-gray-200 rounded-lg px-3 py-2 text-sm bg-white focus:outline-none focus:ring-2 focus:ring-emerald-400"
+                    className="border border-emerald-900/40 rounded-lg px-3 py-2 text-sm bg-black focus:outline-none focus:ring-2 focus:ring-emerald-400"
                   >
                     <option value="g">g</option>
                     <option value="ml">ml</option>
@@ -635,7 +635,7 @@ export function AddManualMealModal({ products, onLog, onClose }: Props) {
                 </div>
 
                 {rowPreview && (
-                  <p className="text-xs text-emerald-700 bg-emerald-50 rounded-lg px-3 py-2">
+                  <p className="text-xs text-emerald-300 bg-black rounded-lg px-3 py-2">
                     {rowPreview.kcal} kcal · Protein {rowPreview.protein}g · Fat {rowPreview.fat}g · Carbs {rowPreview.carbs}g
                   </p>
                 )}
@@ -643,7 +643,7 @@ export function AddManualMealModal({ products, onLog, onClose }: Props) {
                 <button
                   onClick={handleAddEntry}
                   disabled={selectedProductId === '' || !quantity || parseFloat(quantity) <= 0}
-                  className="w-full py-2 bg-emerald-500 disabled:bg-gray-200 disabled:text-gray-400 text-white rounded-lg text-sm font-semibold hover:bg-emerald-600 transition-colors"
+                  className="w-full py-2 bg-emerald-500 disabled:bg-black disabled:text-emerald-400 text-black rounded-lg text-sm font-semibold hover:bg-emerald-400 transition-colors"
                 >
                   + Add to Meal
                 </button>
@@ -657,14 +657,14 @@ export function AddManualMealModal({ products, onLog, onClose }: Props) {
         <div className="mt-4 flex gap-2">
           <button
             onClick={onClose}
-            className="flex-1 py-3 rounded-xl border border-gray-200 text-gray-600 text-sm font-semibold hover:bg-gray-50 transition-colors"
+            className="flex-1 py-3 rounded-xl border border-emerald-900/40 text-emerald-300 text-sm font-semibold hover:bg-black transition-colors"
           >
             Cancel
           </button>
           <button
             onClick={handleLog}
             disabled={entries.length === 0}
-            className="flex-1 py-3 rounded-xl bg-emerald-500 disabled:bg-gray-200 disabled:text-gray-400 text-white text-sm font-semibold hover:bg-emerald-600 transition-colors"
+            className="flex-1 py-3 rounded-xl bg-emerald-500 disabled:bg-black disabled:text-emerald-400 text-black text-sm font-semibold hover:bg-emerald-400 transition-colors"
           >
             Log Meal
           </button>

@@ -8,10 +8,10 @@ import type { Product, InventoryItem, StorageLocation } from '../models/types';
 
 export function InventoryScreen() {
   const { items, addItem, updateItem, removeItem } = useInventory();
-  const allProducts = useLiveQuery(() => db.products.toArray()) ?? [];
+  const allProducts = useLiveQuery(() => db.products.toArray());
   const productMap = useMemo(() => {
     const map = new Map<number, Product>();
-    for (const p of allProducts) map.set(p.id!, p);
+    for (const p of allProducts ?? []) map.set(p.id!, p);
     return map;
   }, [allProducts]);
 
@@ -36,8 +36,8 @@ export function InventoryScreen() {
   return (
     <div className="p-4 pb-24 max-w-lg mx-auto">
       <div className="flex justify-between items-center mb-4">
-        <h1 className="text-xl font-bold text-gray-800">Inventory</h1>
-        <Link to="/products" className="text-sm text-emerald-600 font-medium hover:text-emerald-700">
+        <h1 className="text-xl font-bold text-white">Inventory</h1>
+        <Link to="/products" className="text-sm text-emerald-300 font-medium hover:text-emerald-200">
           Manage Products
         </Link>
       </div>
@@ -50,7 +50,7 @@ export function InventoryScreen() {
       </button>
 
       {items.length === 0 && (
-        <p className="text-sm text-gray-400 text-center py-8">
+        <p className="text-sm text-emerald-400 text-center py-8">
           Your fridge is empty. Add some items!
         </p>
       )}
@@ -60,7 +60,7 @@ export function InventoryScreen() {
         if (group.length === 0) return null;
         return (
           <div key={loc} className="mb-4">
-            <h2 className="text-sm font-semibold text-gray-500 uppercase tracking-wide mb-2">
+            <h2 className="text-sm font-semibold text-emerald-300 uppercase tracking-wide mb-2">
               {locationLabels[loc]} ({group.length})
             </h2>
             <div className="space-y-2">
@@ -143,21 +143,21 @@ function AddEditModal({
 
   return (
     <div className="fixed inset-0 bg-black/50 flex items-end sm:items-center justify-center z-50 p-4">
-      <form onSubmit={handleSubmit} className="bg-white rounded-t-2xl sm:rounded-2xl w-full max-w-md p-6">
+      <form onSubmit={handleSubmit} className="bg-black rounded-t-2xl sm:rounded-2xl w-full max-w-md p-6">
         <div className="flex justify-between items-center mb-4">
-          <h3 className="text-lg font-semibold text-gray-800">
+          <h3 className="text-lg font-semibold text-white">
             {editItem ? 'Edit Item' : 'Add Item'}
           </h3>
-          <button type="button" onClick={onClose} className="text-gray-400 hover:text-gray-600 text-xl">&times;</button>
+          <button type="button" onClick={onClose} className="text-emerald-400 hover:text-emerald-300 text-xl">&times;</button>
         </div>
 
         {!editItem && (
           <div className="mb-3">
-            <label className="block text-sm font-medium text-gray-700 mb-1">Product</label>
+            <label className="block text-sm font-medium text-emerald-200 mb-1">Product</label>
             <select
               value={productId}
               onChange={e => handleProductChange(Number(e.target.value))}
-              className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500"
+              className="w-full border border-emerald-900/40 bg-black text-white rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500"
             >
               {products.map(p => (
                 <option key={p.id} value={p.id}>{p.name}</option>
@@ -168,22 +168,22 @@ function AddEditModal({
 
         <div className="grid grid-cols-2 gap-3 mb-3">
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">Quantity</label>
+            <label className="block text-sm font-medium text-emerald-200 mb-1">Quantity</label>
             <input
               type="number"
               value={quantity}
               onChange={e => setQuantity(e.target.value)}
               min="0"
               step="any"
-              className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500"
+              className="w-full border border-emerald-900/40 bg-black text-white rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500"
             />
           </div>
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">Unit</label>
+            <label className="block text-sm font-medium text-emerald-200 mb-1">Unit</label>
             <select
               value={unit}
               onChange={e => setUnit(e.target.value as 'g' | 'ml' | 'pieces')}
-              className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500"
+              className="w-full border border-emerald-900/40 bg-black text-white rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500"
             >
               <option value="g">grams</option>
               <option value="ml">ml</option>
@@ -193,7 +193,7 @@ function AddEditModal({
         </div>
 
         <div className="mb-3">
-          <label className="block text-sm font-medium text-gray-700 mb-1">Storage</label>
+          <label className="block text-sm font-medium text-emerald-200 mb-1">Storage</label>
           <div className="flex gap-2">
             {(['fridge', 'freezer', 'pantry'] as StorageLocation[]).map(loc => (
               <button
@@ -201,7 +201,7 @@ function AddEditModal({
                 type="button"
                 onClick={() => setLocation(loc)}
                 className={`flex-1 py-2 rounded-lg text-sm font-medium transition-colors ${
-                  location === loc ? 'bg-emerald-500 text-white' : 'bg-gray-100 text-gray-600'
+                  location === loc ? 'bg-emerald-500 text-white' : 'bg-black text-emerald-300'
                 }`}
               >
                 {loc.charAt(0).toUpperCase() + loc.slice(1)}
@@ -211,17 +211,17 @@ function AddEditModal({
         </div>
 
         <div className="mb-4">
-          <label className="block text-sm font-medium text-gray-700 mb-1">Expiration Date</label>
+          <label className="block text-sm font-medium text-emerald-200 mb-1">Expiration Date</label>
           <input
             type="date"
             value={expDate}
             onChange={e => setExpDate(e.target.value)}
-            className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500"
+            className="w-full border border-emerald-900/40 bg-black text-white rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500"
           />
         </div>
 
         {selectedProduct && (
-          <div className="mb-4 text-xs text-gray-400">
+          <div className="mb-4 text-xs text-emerald-400">
             Per 100g: {selectedProduct.kcalPer100} kcal, P:{selectedProduct.proteinPer100}g, F:{selectedProduct.fatPer100}g, C:{selectedProduct.carbsPer100}g
           </div>
         )}

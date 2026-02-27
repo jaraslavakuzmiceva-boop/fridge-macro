@@ -11,24 +11,24 @@ export function MealCard({ meal, products, onDelete }: Props) {
   const [confirming, setConfirming] = useState(false);
 
   return (
-    <div className="p-3 bg-white rounded-lg shadow-sm border border-gray-100">
+    <div className="p-3 bg-black rounded-lg border border-emerald-900/40 shadow-[0_0_0_1px_rgba(16,185,129,0.08)]">
       <div className="flex justify-between items-start">
-        <div className="text-sm text-gray-500">
+        <div className="text-sm text-emerald-400">
           {new Date(meal.createdAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
         </div>
         {onDelete && meal.id && (
           confirming ? (
             <div className="flex items-center gap-2">
-              <span className="text-xs text-gray-500">Remove?</span>
+              <span className="text-xs text-emerald-400">Remove?</span>
               <button
                 onClick={() => onDelete(meal)}
-                className="text-xs font-semibold text-red-500 hover:text-red-700"
+                className="text-xs font-semibold text-emerald-300 hover:text-emerald-200"
               >
                 Yes
               </button>
               <button
                 onClick={() => setConfirming(false)}
-                className="text-xs text-gray-400 hover:text-gray-600"
+                className="text-xs text-emerald-400 hover:text-emerald-200"
               >
                 No
               </button>
@@ -36,7 +36,7 @@ export function MealCard({ meal, products, onDelete }: Props) {
           ) : (
             <button
               onClick={() => setConfirming(true)}
-              className="text-gray-400 hover:text-red-500 text-xs transition-colors"
+              className="text-emerald-400 hover:text-emerald-300 text-xs transition-colors"
             >
               Remove
             </button>
@@ -47,13 +47,13 @@ export function MealCard({ meal, products, onDelete }: Props) {
         {meal.items.map((item, idx) => {
           const product = products.get(item.productId);
           return (
-            <div key={idx} className="text-sm text-gray-700">
+            <div key={idx} className="text-sm text-white">
               {product?.name ?? 'Unknown'} — {item.quantity} {item.unit}
             </div>
           );
         })}
       </div>
-      <div className="mt-2 flex gap-3 text-xs text-gray-500">
+      <div className="mt-2 flex gap-3 text-xs text-emerald-400">
         <span>{meal.totalKcal} kcal</span>
         <span>P: {meal.totalProtein}g</span>
         <span>F: {meal.totalFat}g</span>

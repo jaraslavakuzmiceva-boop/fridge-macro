@@ -11,9 +11,9 @@ export function ExpirationBadge({ status }: { status: ExpirationStatus }) {
 
 export function TierBadge({ tier }: { tier: MealTier }) {
   const colors = {
-    green: 'bg-green-500 text-white',
-    yellow: 'bg-yellow-400 text-gray-900',
-    red: 'bg-red-500 text-white',
+    green: 'bg-emerald-400 text-black',
+    yellow: 'bg-emerald-500 text-black',
+    red: 'bg-emerald-700 text-white',
   };
   const labels = {
     green: 'Great fit',

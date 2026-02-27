@@ -1,8 +1,260 @@
 @import "tailwindcss";
+@import url('https://fonts.googleapis.com/css2?family=Press+Start+2P&family=VT323&display=swap');
 
-body {
-  margin: 0;
-  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-  -webkit-font-smoothing: antialiased;
-  background-color: #f9fafb;
+/* ════════════════════════════════════════════
+   RETRO PIXEL / DARK TERMINAL THEME
+   ════════════════════════════════════════════ */
+
+@theme {
+  /* ── Neutrals → dark terminal surfaces ── */
+  --color-white:     #e0f8e0;
+  --color-gray-50:   #0d0d12;
+  --color-gray-100:  #1a3a1a;
+  --color-gray-200:  #224422;
+  --color-gray-300:  #2d5c2d;
+  --color-gray-400:  #3d7a3d;
+  --color-gray-500:  #55995a;
+  --color-gray-600:  #7abf7a;
+  --color-gray-700:  #9dd49d;
+  --color-gray-800:  #c2ecc2;
+  --color-gray-900:  #e0f8e0;
+
+  /* ── Emerald → neon green ── */
+  --color-emerald-50:  #050d05;
+  --color-emerald-100: #0a1a0a;
+  --color-emerald-400: #2dba4e;
+  --color-emerald-500: #22a83e;
+  --color-emerald-600: #1a8c30;
+  --color-emerald-700: #126620;
+
+  /* ── Red → neon red ── */
+  --color-red-50:  #1a0506;
+  --color-red-400: #ff3355;
+  --color-red-500: #ee2244;
+  --color-red-600: #cc1133;
+
+  /* ── Yellow ── */
+  --color-yellow-50:  #1a1400;
+  --color-yellow-500: #ffd700;
+  --color-yellow-600: #ccaa00;
+
+  /* ── Blue / info ── */
+  --color-blue-50:  #04040e;
+  --color-blue-500: #00ccee;
+  --color-blue-600: #00aacc;
+
+  /* ── Green (macro grid) ── */
+  --color-green-50:  #050d05;
+  --color-green-500: #22a83e;
+  --color-green-600: #1a8c30;
+
+  /* ── Typography ── */
+  --font-sans: 'VT323', 'Courier New', monospace;
+  --font-mono: 'VT323', 'Courier New', monospace;
+
+  /* ── Pixel-sharp corners ── */
+  --radius-sm:   0px;
+  --radius:      0px;
+  --radius-md:   0px;
+  --radius-lg:   0px;
+  --radius-xl:   0px;
+  --radius-2xl:  0px;
+  --radius-3xl:  0px;
+  --radius-full: 0px;
+
+  /* ── Pixel box-shadows ── */
+  --shadow-sm:  3px 3px 0 #001200;
+  --shadow:     4px 4px 0 #001200;
+  --shadow-md:  4px 4px 0 #001200;
+  --shadow-lg:  6px 6px 0 #001200;
+}
+
+/* ── Base styles ── */
+@layer base {
+  body {
+    background-color: #0a0a0f;
+    color: #b8ddb8;
+    font-family: 'VT323', 'Courier New', monospace;
+    font-size: 1.15rem;
+    line-height: 1.5;
+    -webkit-font-smoothing: none;
+  }
+
+  h1, h2, h3, h4 {
+    font-family: 'Press Start 2P', monospace;
+    line-height: 1.8;
+    color: #39ff14;
+    text-shadow: 0 0 10px rgba(57, 255, 20, 0.35);
+  }
+
+  input, select, textarea, button {
+    font-family: 'VT323', 'Courier New', monospace;
+  }
+
+  ::-webkit-scrollbar       { width: 8px; background: #0a0a0f; }
+  ::-webkit-scrollbar-thumb { background: #1a3a1a; border: 1px solid #22a83e; }
+  ::-webkit-scrollbar-thumb:hover { background: #22a83e; }
+
+  ::selection { background: #39ff14; color: #0a0a0f; }
+}
+
+/* ── Scanlines overlay ── */
+body::after {
+  content: '';
+  position: fixed;
+  inset: 0;
+  background: repeating-linear-gradient(
+    0deg,
+    transparent 0px,
+    transparent 3px,
+    rgba(0, 0, 0, 0.08) 3px,
+    rgba(0, 0, 0, 0.08) 4px
+  );
+  pointer-events: none;
+  z-index: 9999;
+}
+
+/* ── Component classes ── */
+@layer components {
+
+  /* Card */
+  .px-card {
+    background: #111118;
+    border: 2px solid #1a3a1a;
+    box-shadow: 4px 4px 0 #001200;
+  }
+
+  /* Primary button */
+  .px-btn {
+    font-family: 'Press Start 2P', monospace;
+    font-size: 0.6rem;
+    line-height: 1.8;
+    background: #22a83e;
+    color: #ffffff;
+    border: none;
+    padding: 14px 20px;
+    cursor: pointer;
+    box-shadow: 4px 4px 0 #004400;
+    transition: box-shadow 0.05s, transform 0.05s;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    border-radius: 0;
+    width: 100%;
+  }
+  .px-btn:hover:not(:disabled)  { background: #2dba4e; }
+  .px-btn:active:not(:disabled) { box-shadow: 1px 1px 0 #004400; transform: translate(3px, 3px); }
+  .px-btn:disabled               { background: #1a3a1a; color: #3d7a3d; box-shadow: none; cursor: not-allowed; }
+
+  /* Outline button */
+  .px-btn-outline {
+    font-family: 'Press Start 2P', monospace;
+    font-size: 0.6rem;
+    line-height: 1.8;
+    background: transparent;
+    color: #39ff14;
+    border: 2px solid #39ff14;
+    padding: 12px 18px;
+    cursor: pointer;
+    box-shadow: 4px 4px 0 #004400;
+    transition: box-shadow 0.05s, transform 0.05s;
+    text-transform: uppercase;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    border-radius: 0;
+    width: 100%;
+  }
+  .px-btn-outline:hover:not(:disabled)  { background: rgba(57,255,20,0.06); }
+  .px-btn-outline:active:not(:disabled) { box-shadow: 1px 1px 0 #004400; transform: translate(3px, 3px); }
+  .px-btn-outline:disabled               { border-color: #1a3a1a; color: #3d7a3d; box-shadow: none; cursor: not-allowed; }
+
+  /* Danger button */
+  .px-btn-danger {
+    font-family: 'Press Start 2P', monospace;
+    font-size: 0.6rem;
+    line-height: 1.8;
+    background: #ee2244;
+    color: #ffffff;
+    border: none;
+    padding: 10px 16px;
+    cursor: pointer;
+    box-shadow: 4px 4px 0 #660011;
+    transition: box-shadow 0.05s, transform 0.05s;
+    text-transform: uppercase;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    border-radius: 0;
+  }
+  .px-btn-danger:active { box-shadow: 1px 1px 0 #660011; transform: translate(3px, 3px); }
+
+  /* Input */
+  .px-input {
+    background: #08080e;
+    color: #b8ddb8;
+    border: 2px solid #1a3a1a;
+    font-family: 'VT323', 'Courier New', monospace;
+    font-size: 1.2rem;
+    padding: 8px 12px;
+    outline: none;
+    border-radius: 0;
+    width: 100%;
+    transition: border-color 0.1s;
+  }
+  .px-input:focus      { border-color: #39ff14; box-shadow: 0 0 8px rgba(57,255,20,0.2); }
+  .px-input::placeholder { color: #2d5c2d; }
+
+  /* Pixel progress bar */
+  .px-bar-track {
+    background: #08080e;
+    border: 2px solid #1a3a1a;
+    height: 18px;
+    overflow: hidden;
+  }
+  .px-bar-fill {
+    height: 100%;
+    background: repeating-linear-gradient(
+      90deg,
+      #39ff14 0px, #39ff14 8px,
+      #1a8c30 8px, #1a8c30 10px
+    );
+    transition: width 0.4s;
+  }
+  .px-bar-fill.danger {
+    background: repeating-linear-gradient(
+      90deg,
+      #ff3355 0px, #ff3355 8px,
+      #880022 8px, #880022 10px
+    );
+  }
+
+  /* Section label */
+  .px-label {
+    font-family: 'Press Start 2P', monospace;
+    font-size: 0.5rem;
+    color: #3d7a3d;
+    text-transform: uppercase;
+    letter-spacing: 0.12em;
+  }
+
+  /* Neon text */
+  .neon-green  { color: #39ff14; text-shadow: 0 0 8px rgba(57,255,20,0.6);  }
+  .neon-red    { color: #ff3355; text-shadow: 0 0 8px rgba(255,51,85,0.6);   }
+  .neon-yellow { color: #ffd700; text-shadow: 0 0 8px rgba(255,215,0,0.5);   }
+  .neon-cyan   { color: #00e5ff; text-shadow: 0 0 8px rgba(0,229,255,0.5);   }
+
+  /* Blinking cursor */
+  @keyframes blink { 50% { opacity: 0; } }
+  .cursor::after {
+    content: '▮';
+    animation: blink 1s step-end infinite;
+    color: #39ff14;
+    margin-left: 3px;
+  }
 }
