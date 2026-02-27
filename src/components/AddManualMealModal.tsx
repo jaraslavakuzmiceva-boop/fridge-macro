@@ -1,6 +1,107 @@
-import { useState, useMemo } from 'react';
+import { useState, useMemo, useRef } from 'react';
 import { calcItemMacros } from '../logic/macroCalculator';
 import type { Product, MealItem } from '../models/types';
+
+type SpeechRecognitionLike = {
+  lang: string;
+  interimResults: boolean;
+  continuous: boolean;
+  onresult: (event: SpeechRecognitionEventLike) => void;
+  onerror: () => void;
+  onend: () => void;
+  start: () => void;
+  stop: () => void;
+};
+
+type SpeechRecognitionConstructor = new () => SpeechRecognitionLike;
+
+type SpeechRecognitionResultLike = {
+  isFinal: boolean;
+  0: { transcript: string };
+  length: number;
+};
+
+type SpeechRecognitionEventLike = {
+  resultIndex: number;
+  results: ArrayLike<SpeechRecognitionResultLike>;
+};
+
+function levenshtein(a: string, b: string): number {
+  const alen = a.length;
+  const blen = b.length;
+  if (alen === 0) return blen;
+  if (blen === 0) return alen;
+  const dp = new Array(blen + 1);
+  for (let j = 0; j <= blen; j++) dp[j] = j;
+  for (let i = 1; i <= alen; i++) {
+    let prev = dp[0];
+    dp[0] = i;
+    for (let j = 1; j <= blen; j++) {
+      const temp = dp[j];
+      const cost = a[i - 1] === b[j - 1] ? 0 : 1;
+      dp[j] = Math.min(
+        dp[j] + 1,
+        dp[j - 1] + 1,
+        prev + cost
+      );
+      prev = temp;
+    }
+  }
+  return dp[blen];
+}
+
+function fuzzyScore(name: string, query: string): number {
+  const n = name.toLowerCase();
+  const q = query.toLowerCase().trim();
+  if (!q) return 1;
+
+  const tokens = q.split(/\s+/).filter(Boolean);
+  const nameTokens = n.split(/[^a-z0-9]+/).filter(Boolean);
+  let total = 0;
+
+  for (const token of tokens) {
+    if (!token) continue;
+
+    if (n.includes(token)) {
+      const idx = n.indexOf(token);
+      total += 100 - idx + Math.min(20, Math.round((token.length / n.length) * 20));
+      continue;
+    }
+
+    // subsequence match
+    let ni = 0;
+    let ti = 0;
+    let gaps = 0;
+    while (ni < n.length && ti < token.length) {
+      if (n[ni] === token[ti]) {
+        ti++;
+      } else {
+        gaps++;
+      }
+      ni++;
+    }
+    if (ti !== token.length) return 0;
+    const density = token.length / (token.length + gaps);
+    total += 50 + Math.round(density * 20);
+  }
+
+  // typo tolerance per token
+  for (const token of tokens) {
+    if (!token) continue;
+    const maxDist = Math.min(2, Math.max(1, Math.floor(token.length / 4)));
+    let best = Infinity;
+    for (const nt of nameTokens) {
+      const d = levenshtein(token, nt);
+      if (d < best) best = d;
+      if (best === 0) break;
+    }
+    if (best <= maxDist) {
+      total += 30 + (maxDist - best) * 5;
+    }
+  }
+
+  return total;
+}
 
 interface ManualEntry {
   productId: number;
@@ -25,83 +126,11 @@ export function AddManualMealModal({ products, onLog, onClose }: Props) {
   const [quantity, setQuantity] = useState('100');
   const [unit, setUnit] = useState<'g' | 'ml' | 'pieces'>('g');
   const [search, setSearch] = useState('');
-
-  function levenshtein(a: string, b: string): number {
-    const alen = a.length;
-    const blen = b.length;
-    if (alen === 0) return blen;
-    if (blen === 0) return alen;
-    const dp = new Array(blen + 1);
-    for (let j = 0; j <= blen; j++) dp[j] = j;
-    for (let i = 1; i <= alen; i++) {
-      let prev = dp[0];
-      dp[0] = i;
-      for (let j = 1; j <= blen; j++) {
-        const temp = dp[j];
-        const cost = a[i - 1] === b[j - 1] ? 0 : 1;
-        dp[j] = Math.min(
-          dp[j] + 1,
-          dp[j - 1] + 1,
-          prev + cost
-        );
-        prev = temp;
-      }
-    }
-    return dp[blen];
-  }
-
-  function fuzzyScore(name: string, query: string): number {
-    const n = name.toLowerCase();
-    const q = query.toLowerCase().trim();
-    if (!q) return 1;
-
-    const tokens = q.split(/\s+/).filter(Boolean);
-    const nameTokens = n.split(/[^a-z0-9]+/).filter(Boolean);
-    let total = 0;
-
-    for (const token of tokens) {
-      if (!token) continue;
-
-      if (n.includes(token)) {
-        const idx = n.indexOf(token);
-        total += 100 - idx + Math.min(20, Math.round((token.length / n.length) * 20));
-        continue;
-      }
-
-      // subsequence match
-      let ni = 0;
-      let ti = 0;
-      let gaps = 0;
-      while (ni < n.length && ti < token.length) {
-        if (n[ni] === token[ti]) {
-          ti++;
-        } else {
-          gaps++;
-        }
-        ni++;
-      }
-      if (ti !== token.length) return 0;
-      const density = token.length / (token.length + gaps);
-      total += 50 + Math.round(density * 20);
-    }
-
-    // typo tolerance per token
-    for (const token of tokens) {
-      if (!token) continue;
-      const maxDist = Math.min(2, Math.max(1, Math.floor(token.length / 4)));
-      let best = Infinity;
-      for (const nt of nameTokens) {
-        const d = levenshtein(token, nt);
-        if (d < best) best = d;
-        if (best === 0) break;
-      }
-      if (best <= maxDist) {
-        total += 30 + (maxDist - best) * 5;
-      }
-    }
-
-    return total;
-  }
+  const [speechLang, setSpeechLang] = useState<'en-US' | 'ru-RU'>('en-US');
+  const [transcript, setTranscript] = useState('');
+  const [isListening, setIsListening] = useState(false);
+  const [speechError, setSpeechError] = useState<string | null>(null);
+  const recognitionRef = useRef<SpeechRecognitionLike | null>(null);
 
   const filteredProducts = useMemo(() => {
     const q = search.trim();
@@ -112,6 +141,168 @@ export function AddManualMealModal({ products, onLog, onClose }: Props) {
       .sort((a, b) => b.score - a.score || a.p.name.localeCompare(b.p.name));
     return scored.map(x => x.p);
   }, [productList, search]);
+
+  function getBestProductMatch(query: string): Product | null {
+    const q = query.trim();
+    if (!q) return null;
+    let best: { p: Product; score: number } | null = null;
+    for (const p of productList) {
+      const score = fuzzyScore(p.name, q);
+      if (score <= 0) continue;
+      if (!best || score > best.score) best = { p, score };
+    }
+    return best?.p ?? null;
+  }
+
+  function applyRussianAliases(input: string): string {
+    const aliases: Array<[RegExp, string]> = [
+      [/\bяйц(о|а|ы)?\b/g, 'eggs'],
+      [/\bкуриц(а|ы)?\b|\bкурин(ая|ые)?\b/g, 'chicken'],
+      [/\bкурин(ая|ые)?\s+грудк(а|и)?\b/g, 'chicken breast'],
+      [/\bрис\b/g, 'rice'],
+      [/\bовсян(ка|ые хлопья)?\b/g, 'oats'],
+      [/\bброкколи\b/g, 'broccoli'],
+      [/\bлосос(ь|я)\b/g, 'salmon'],
+      [/\bмолок(о|а)\b/g, 'milk'],
+      [/\bхлеб\b/g, 'bread'],
+      [/\bпомидор(ы|а)?\b|\bтомат(ы|а)?\b/g, 'tomatoes'],
+      [/\bавокадо\b/g, 'avocado'],
+      [/\bшпинат\b/g, 'spinach'],
+      [/\bиндейк(а|и)?\b/g, 'turkey breast'],
+    ];
+    let out = input;
+    for (const [re, rep] of aliases) out = out.replace(re, rep);
+    return out;
+  }
+
+  function detectLang(text: string): 'en-US' | 'ru-RU' {
+    return /[а-яё]/i.test(text) ? 'ru-RU' : 'en-US';
+  }
+
+  function parseSpeechToEntries(text: string, lang: 'en-US' | 'ru-RU'): ManualEntry[] {
+    const normalized = text
+      .toLowerCase()
+      .replace(/([,;])/g, ' $1 ')
+      .replace(/\s+/g, ' ')
+      .trim();
+    if (!normalized) return [];
+
+    const numberWords: Record<string, number> = {
+      one: 1, two: 2, three: 3, four: 4, five: 5,
+      six: 6, seven: 7, eight: 8, nine: 9, ten: 10,
+      half: 0.5,
+      один: 1, одна: 1, два: 2, две: 2, три: 3, четыре: 4, пять: 5,
+      шесть: 6, семь: 7, восемь: 8, девять: 9, десять: 10,
+      пол: 0.5,
+    };
+
+    const segments = normalized.split(/\s+(and|,)\s+/).filter(s => s !== 'and' && s !== ',');
+    const results: ManualEntry[] = [];
+
+    for (const seg of segments) {
+      let s = seg.trim();
+      if (!s) continue;
+
+      let qty: number | null = null;
+      let unit: 'g' | 'ml' | 'pieces' | null = null;
+
+      const wordMatch = s.match(/^(one|two|three|four|five|six|seven|eight|nine|ten|half|один|одна|два|две|три|четыре|пять|шесть|семь|восемь|девять|десять|пол)\b/);
+      if (wordMatch) {
+        qty = numberWords[wordMatch[1]];
+        s = s.slice(wordMatch[0].length).trim();
+      }
+
+      const numMatch = s.match(/(\d+(?:\.\d+)?)/);
+      if (numMatch) {
+        qty = parseFloat(numMatch[1]);
+        s = s.replace(numMatch[0], '').trim();
+      }
+
+      if (s.match(/\bkg\b|\bkilogram(s)?\b|\bкг\b|\bкилограмм(а|ов)?\b/)) {
+        unit = 'g';
+        if (qty !== null) qty = qty * 1000;
+        s = s.replace(/\bkg\b|\bkilogram(s)?\b|\bкг\b|\bкилограмм(а|ов)?\b/g, '').trim();
+      } else if (s.match(/\bl\b|\bliter(s)?\b|\bл\b|\bлитр(а|ов)?\b/)) {
+        unit = 'ml';
+        if (qty !== null) qty = qty * 1000;
+        s = s.replace(/\bl\b|\bliter(s)?\b|\bл\b|\bлитр(а|ов)?\b/g, '').trim();
+      } else if (s.match(/\bg\b|\bgram(s)?\b|\bг\b|\bгр\b|\bграмм(а|ов)?\b/)) {
+        unit = 'g';
+        s = s.replace(/\bg\b|\bgram(s)?\b|\bг\b|\bгр\b|\bграмм(а|ов)?\b/g, '').trim();
+      } else if (s.match(/\bml\b|\bmilliliter(s)?\b|\bмл\b|\bмиллилитр(а|ов)?\b/)) {
+        unit = 'ml';
+        s = s.replace(/\bml\b|\bmilliliter(s)?\b|\bмл\b|\bмиллилитр(а|ов)?\b/g, '').trim();
+      } else if (s.match(/\bpcs?\b|\bpieces?\b|\bшт\b|\bштук(а|и)?\b|\bштуки\b/)) {
+        unit = 'pieces';
+        s = s.replace(/\bpcs?\b|\bpieces?\b|\bшт\b|\bштук(а|и)?\b|\bштуки\b/g, '').trim();
+      } else if (s.match(/\begg(s)?\b|\bяйц(о|а|ы)?\b/)) {
+        unit = 'pieces';
+      }
+
+      const productQuery = lang === 'ru-RU' ? applyRussianAliases(s) : s;
+      const product = getBestProductMatch(productQuery);
+      if (!product) continue;
+
+      if (unit === null) unit = product.defaultUnit;
+      if (qty === null || isNaN(qty) || qty <= 0) continue;
+
+      results.push({
+        productId: product.id!,
+        quantity: String(qty),
+        unit,
+      });
+    }
+
+    return results;
+  }
+
+  function startSpeech() {
+    const SpeechRecognitionCtor =
+      window.SpeechRecognition ||
+      (window as Window & { webkitSpeechRecognition?: SpeechRecognitionConstructor }).webkitSpeechRecognition;
+    if (!SpeechRecognitionCtor) {
+      setSpeechError('Speech recognition not supported in this browser.');
+      return;
+    }
+    setSpeechError(null);
+    const recognition: SpeechRecognitionLike = new SpeechRecognitionCtor();
+    recognition.lang = speechLang;
+    recognition.interimResults = true;
+    recognition.continuous = false;
+    recognition.onresult = event => {
+      let finalText = '';
+      let interimText = '';
+      for (let i = event.resultIndex; i < event.results.length; i++) {
+        const result = event.results[i];
+        if (result.isFinal) finalText += result[0].transcript + ' ';
+        else interimText += result[0].transcript + ' ';
+      }
+      setTranscript((finalText + interimText).trim());
+    };
+    recognition.onerror = () => {
+      setSpeechError('Could not capture speech. Please try again.');
+      setIsListening(false);
+    };
+    recognition.onend = () => {
+      setIsListening(false);
+    };
+    recognitionRef.current = recognition;
+    setIsListening(true);
+    recognition.start();
+  }
+
+  function stopSpeech() {
+    recognitionRef.current?.stop();
+  }
+
+  function handleSpeechAdd() {
+    const lang = detectLang(transcript);
+    setSpeechLang(lang);
+    const parsed = parseSpeechToEntries(transcript, lang);
+    if (parsed.length === 0) return;
+    setEntries(prev => [...prev, ...parsed]);
+    setTranscript('');
+  }
 
   function handleProductSelect(id: number) {
     setSelectedProductId(id);
@@ -260,6 +451,40 @@ export function AddManualMealModal({ products, onLog, onClose }: Props) {
                   ))}
                 </div>
               )}
+            </div>
+
+            {/* Speech to text */}
+            <div className="space-y-2">
+              <div className="flex items-center gap-2">
+                <button
+                  type="button"
+                  onClick={isListening ? stopSpeech : startSpeech}
+                  className={`px-3 py-2 rounded-lg text-sm font-semibold transition-colors ${
+                    isListening ? 'bg-emerald-600 text-white' : 'bg-emerald-100 text-emerald-700'
+                  }`}
+                >
+                  {isListening ? 'Listening…' : 'Speak Meal'}
+                </button>
+                <span className="text-xs text-gray-400">Auto-detects EN/RU</span>
+              </div>
+              {speechError && (
+                <p className="text-xs text-red-500">{speechError}</p>
+              )}
+              <textarea
+                placeholder="Speech transcript will appear here. You can edit before adding."
+                value={transcript}
+                onChange={e => setTranscript(e.target.value)}
+                className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm bg-white focus:outline-none focus:ring-2 focus:ring-emerald-400"
+                rows={2}
+              />
+              <button
+                type="button"
+                onClick={handleSpeechAdd}
+                disabled={!transcript.trim()}
+                className="w-full py-2 bg-emerald-500 disabled:bg-gray-200 disabled:text-gray-400 text-white rounded-lg text-sm font-semibold hover:bg-emerald-600 transition-colors"
+              >
+                Add Items From Speech
+              </button>
             </div>
 
             {/* Quantity + unit */}
