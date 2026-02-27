@@ -26,9 +26,91 @@ export function AddManualMealModal({ products, onLog, onClose }: Props) {
   const [unit, setUnit] = useState<'g' | 'ml' | 'pieces'>('g');
   const [search, setSearch] = useState('');
 
+  function levenshtein(a: string, b: string): number {
+    const alen = a.length;
+    const blen = b.length;
+    if (alen === 0) return blen;
+    if (blen === 0) return alen;
+    const dp = new Array(blen + 1);
+    for (let j = 0; j <= blen; j++) dp[j] = j;
+    for (let i = 1; i <= alen; i++) {
+      let prev = dp[0];
+      dp[0] = i;
+      for (let j = 1; j <= blen; j++) {
+        const temp = dp[j];
+        const cost = a[i - 1] === b[j - 1] ? 0 : 1;
+        dp[j] = Math.min(
+          dp[j] + 1,
+          dp[j - 1] + 1,
+          prev + cost
+        );
+        prev = temp;
+      }
+    }
+    return dp[blen];
+  }
+
+  function fuzzyScore(name: string, query: string): number {
+    const n = name.toLowerCase();
+    const q = query.toLowerCase().trim();
+    if (!q) return 1;
+
+    const tokens = q.split(/\s+/).filter(Boolean);
+    const nameTokens = n.split(/[^a-z0-9]+/).filter(Boolean);
+    let total = 0;
+
+    for (const token of tokens) {
+      if (!token) continue;
+
+      if (n.includes(token)) {
+        const idx = n.indexOf(token);
+        total += 100 - idx + Math.min(20, Math.round((token.length / n.length) * 20));
+        continue;
+      }
+
+      // subsequence match
+      let ni = 0;
+      let ti = 0;
+      let gaps = 0;
+      while (ni < n.length && ti < token.length) {
+        if (n[ni] === token[ti]) {
+          ti++;
+        } else {
+          gaps++;
+        }
+        ni++;
+      }
+      if (ti !== token.length) return 0;
+      const density = token.length / (token.length + gaps);
+      total += 50 + Math.round(density * 20);
+    }
+
+    // typo tolerance per token
+    for (const token of tokens) {
+      if (!token) continue;
+      const maxDist = Math.min(2, Math.max(1, Math.floor(token.length / 4)));
+      let best = Infinity;
+      for (const nt of nameTokens) {
+        const d = levenshtein(token, nt);
+        if (d < best) best = d;
+        if (best === 0) break;
+      }
+      if (best <= maxDist) {
+        total += 30 + (maxDist - best) * 5;
+      }
+    }
+
+    return total;
+  }
+
   const filteredProducts = useMemo(() => {
-    const q = search.toLowerCase();
-    return q ? productList.filter(p => p.name.toLowerCase().includes(q)) : productList;
+    const q = search.trim();
+    if (!q) return productList;
+    const scored = productList
+      .map(p => ({ p, score: fuzzyScore(p.name, q) }))
+      .filter(x => x.score > 0)
+      .sort((a, b) => b.score - a.score || a.p.name.localeCompare(b.p.name));
+    return scored.map(x => x.p);
   }, [productList, search]);
 
   function handleProductSelect(id: number) {
