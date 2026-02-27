@@ -149,13 +149,13 @@ export function TodayScreen() {
               </svg>
               Generating…
             </>
-          ) : 'Generate Next Meal'}
+          ) : 'Generate Meal'}
         </button>
         <button
           onClick={() => setShowManualEntry(true)}
           className="flex-1 py-3 bg-black text-emerald-500 border border-emerald-500 rounded-xl font-semibold text-base hover:bg-emerald-900/30 transition-colors shadow-sm"
         >
-          Add Meal Manually
+          Add
         </button>
       </div>
 
