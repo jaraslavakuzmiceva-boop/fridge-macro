@@ -447,6 +447,27 @@ export function AddManualMealModal({ products, onLog, onClose }: Props) {
         </div>
 
         <div className="flex-1 overflow-y-auto space-y-4">
+          {/* Totals */}
+          {entries.length > 0 && (
+            <div className="bg-emerald-50 rounded-xl p-4">
+              <p className="text-xs font-semibold text-emerald-700 uppercase tracking-wide mb-2">Meal Total</p>
+              <div className="grid grid-cols-4 gap-2 text-center">
+                {[
+                  { label: 'Calories', value: `${totals.kcal}`, unit: 'kcal' },
+                  { label: 'Protein', value: `${totals.protein}`, unit: 'g' },
+                  { label: 'Fat', value: `${totals.fat}`, unit: 'g' },
+                  { label: 'Carbs', value: `${totals.carbs}`, unit: 'g' },
+                ].map(({ label, value, unit: u }) => (
+                  <div key={label} className="bg-white rounded-lg p-2">
+                    <p className="text-xs text-gray-500">{label}</p>
+                    <p className="text-sm font-bold text-gray-800">{value}</p>
+                    <p className="text-xs text-gray-400">{u}</p>
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
+
           {/* Added items */}
           {entries.length > 0 && (
             <div className="space-y-2">
@@ -647,26 +668,6 @@ export function AddManualMealModal({ products, onLog, onClose }: Props) {
             )}
           </div>
 
-          {/* Totals */}
-          {entries.length > 0 && (
-            <div className="bg-emerald-50 rounded-xl p-4">
-              <p className="text-xs font-semibold text-emerald-700 uppercase tracking-wide mb-2">Meal Total</p>
-              <div className="grid grid-cols-4 gap-2 text-center">
-                {[
-                  { label: 'Calories', value: `${totals.kcal}`, unit: 'kcal' },
-                  { label: 'Protein', value: `${totals.protein}`, unit: 'g' },
-                  { label: 'Fat', value: `${totals.fat}`, unit: 'g' },
-                  { label: 'Carbs', value: `${totals.carbs}`, unit: 'g' },
-                ].map(({ label, value, unit: u }) => (
-                  <div key={label} className="bg-white rounded-lg p-2">
-                    <p className="text-xs text-gray-500">{label}</p>
-                    <p className="text-sm font-bold text-gray-800">{value}</p>
-                    <p className="text-xs text-gray-400">{u}</p>
-                  </div>
-                ))}
-              </div>
-            </div>
-          )}
         </div>
 
         {/* Footer */}
