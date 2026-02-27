@@ -46,7 +46,7 @@ export function ProductsScreen() {
           <div key={product.id} className="px-card p-3">
             <div className="flex justify-between items-start">
               <div>
-                <div className="text-sm font-medium text-gray-800">{product.name}</div>
+                <div className="tx-body font-medium">{product.name}</div>
                 <div className="px-label mt-0.5">
                   {product.kcalPer100} kcal · P:{product.proteinPer100}g · F:{product.fatPer100}g · C:{product.carbsPer100}g /100{product.defaultUnit === 'ml' ? 'ml' : 'g'}
                 </div>
@@ -80,7 +80,7 @@ export function ProductsScreen() {
       </div>
 
       {filtered.length === 0 && (
-        <p className="text-sm text-gray-600 text-center py-8">
+        <p className="tx-secondary text-center py-8">
           {search ? 'No products match your search.' : 'No product templates yet.'}
         </p>
       )}

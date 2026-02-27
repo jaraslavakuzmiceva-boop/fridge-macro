@@ -459,7 +459,7 @@ export function AddManualMealModal({ products, onLog, onClose }: Props) {
                 ].map(({ label, value, unit: u }) => (
                   <div key={label} className="px-card p-2">
                     <p className="px-label">{label}</p>
-                    <p className="text-sm font-bold text-gray-800 mt-1">{value}</p>
+                    <p className="tx-value mt-1">{value}</p>
                     <p className="px-label mt-0.5">{u}</p>
                   </div>
                 ))}
@@ -478,7 +478,7 @@ export function AddManualMealModal({ products, onLog, onClose }: Props) {
                 return (
                   <div key={idx} className="px-card flex items-start justify-between p-3">
                     <div className="flex-1 min-w-0">
-                      <p className="text-sm font-medium text-gray-800 truncate">{p?.name ?? 'Unknown'}</p>
+                      <p className="tx-body font-medium truncate">{p?.name ?? 'Unknown'}</p>
                       <p className="px-label mt-0.5">{e.quantity} {e.unit}</p>
                       {m && (
                         <p className="px-label mt-0.5">
@@ -577,7 +577,7 @@ export function AddManualMealModal({ products, onLog, onClose }: Props) {
                         handleProductSelect(p.id!);
                         setShowDropdown(false);
                       }}
-                      className="w-full text-left px-3 py-2 text-sm text-gray-800 hover:bg-gray-100"
+                      className="w-full text-left px-3 py-2 tx-body hover:bg-gray-100"
                       style={{ display: 'block' }}
                     >
                       {p.name}

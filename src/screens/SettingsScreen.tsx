@@ -4,7 +4,7 @@ import { useSettings } from '../hooks/useSettings';
 export function SettingsScreen() {
   const { settings, updateSettings } = useSettings();
 
-  if (!settings) return <div className="p-4 text-gray-600">Loading...</div>;
+  if (!settings) return <div className="p-4 tx-secondary">Loading...</div>;
 
   return (
     <div className="p-4 pb-24 max-w-lg mx-auto">

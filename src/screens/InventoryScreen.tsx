@@ -49,7 +49,7 @@ export function InventoryScreen() {
       </button>
 
       {items.length === 0 && (
-        <p className="text-sm text-gray-600 text-center py-8">
+        <p className="tx-secondary text-center py-8">
           Your fridge is empty. Add some items!
         </p>
       )}
@@ -213,7 +213,7 @@ function AddEditModal({
         </div>
 
         {selectedProduct && (
-          <div className="mb-4 text-xs text-gray-600">
+          <div className="mb-4 tx-meta">
             Per 100g: {selectedProduct.kcalPer100} kcal, P:{selectedProduct.proteinPer100}g, F:{selectedProduct.fatPer100}g, C:{selectedProduct.carbsPer100}g
           </div>
         )}

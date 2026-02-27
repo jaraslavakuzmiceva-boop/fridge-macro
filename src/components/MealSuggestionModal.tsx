@@ -16,7 +16,7 @@ function MacroCell({ label, actual, ideal }: { label: string; actual: number; id
   const dev = ideal && ideal > 0 ? (actual - ideal) / ideal : null;
   const devPct = dev !== null ? Math.round(Math.abs(dev) * 100) : null;
   const colorClass =
-    dev === null        ? 'text-gray-600'
+    dev === null        ? ''
     : Math.abs(dev) <= 0.10 ? 'neon-green'
     : Math.abs(dev) <= 0.20 ? 'neon-yellow'
     : 'neon-red';
@@ -25,9 +25,9 @@ function MacroCell({ label, actual, ideal }: { label: string; actual: number; id
   return (
     <div className="px-card p-2 text-center">
       <div className="px-label">{label}</div>
-      <div className={`text-sm font-semibold mt-1 ${colorClass}`}>{actual}</div>
+      <div className={`tx-value mt-1 ${colorClass}`}>{actual}</div>
       {ideal !== null && (
-        <div className="text-xs text-gray-600 mt-0.5">
+        <div className="tx-meta mt-0.5">
           /{ideal}{devPct !== null && devPct > 5 ? `${arrow}${devPct}%` : ''}
         </div>
       )}
@@ -43,7 +43,7 @@ export function MealSuggestionModal({ candidates, products, idealMacros, onAccep
       <div className="fixed inset-0 bg-black/70 flex items-end sm:items-center justify-center z-50 p-4">
         <div className="px-card w-full max-w-md p-6">
           <h3 className="mb-2">No Meal Suggestions</h3>
-          <p className="text-sm text-gray-600 mb-4">
+          <p className="tx-secondary mb-4">
             Not enough inventory to generate meal suggestions. Add more items to your fridge!
           </p>
           <button onClick={onClose} className="px-btn-outline">Close</button>
@@ -98,8 +98,8 @@ export function MealSuggestionModal({ candidates, products, idealMacros, onAccep
             const product = products.get(item.productId);
             return (
               <div key={idx} className="flex justify-between p-2" style={{ borderBottom: '1px solid #1a3a1a' }}>
-                <span className="text-sm text-gray-800">{product?.name ?? 'Unknown'}</span>
-                <span className="text-sm text-gray-600">{item.quantity} {item.unit}</span>
+                <span className="tx-body">{product?.name ?? 'Unknown'}</span>
+                <span className="tx-secondary">{item.quantity} {item.unit}</span>
               </div>
             );
           })}

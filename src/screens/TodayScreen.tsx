@@ -105,7 +105,7 @@ export function TodayScreen() {
     }, 400);
   }
 
-  if (!settings) return <div className="p-4 text-gray-600">Loading...</div>;
+  if (!settings) return <div className="p-4 tx-secondary">Loading...</div>;
 
   const simpleCarbPct = consumed.kcal > 0
     ? ((consumed.simpleCarbs * 4) / consumed.kcal * 100)
@@ -128,7 +128,7 @@ export function TodayScreen() {
 
         <div className="mt-2 flex items-center gap-2">
           <span className="px-label">Simple carbs:</span>
-          <span className={`text-xs ${simpleCarbPct > settings.simpleCarbLimitPercent ? 'neon-red' : 'text-gray-600'}`}>
+          <span className={`tx-meta ${simpleCarbPct > settings.simpleCarbLimitPercent ? 'neon-red' : ''}`}>
             {simpleCarbPct.toFixed(1)}% of kcal
             {simpleCarbPct > settings.simpleCarbLimitPercent && ' [over limit!]'}
           </span>
@@ -162,7 +162,7 @@ export function TodayScreen() {
       <div className="space-y-3">
         <h2 className="px-label">Today's Meals ({todayMeals.length})</h2>
         {todayMeals.length === 0 && (
-          <p className="text-sm text-gray-600">No meals logged yet. Generate your first meal!</p>
+          <p className="tx-secondary">No meals logged yet. Generate your first meal!</p>
         )}
         {todayMeals.map(meal => (
           <MealCard key={meal.id} meal={meal} products={productMap} onDelete={deleteMeal} />

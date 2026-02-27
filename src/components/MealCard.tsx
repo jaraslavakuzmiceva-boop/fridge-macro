@@ -13,7 +13,7 @@ export function MealCard({ meal, products, onDelete }: Props) {
   return (
     <div className="px-card p-3">
       <div className="flex justify-between items-start">
-        <div className="text-sm text-gray-600">
+        <div className="tx-secondary">
           {new Date(meal.createdAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
         </div>
         {onDelete && meal.id && (
@@ -34,13 +34,13 @@ export function MealCard({ meal, products, onDelete }: Props) {
         {meal.items.map((item, idx) => {
           const product = products.get(item.productId);
           return (
-            <div key={idx} className="text-sm text-gray-800">
+            <div key={idx} className="tx-body">
               {product?.name ?? 'Unknown'} — {item.quantity} {item.unit}
             </div>
           );
         })}
       </div>
-      <div className="mt-2 flex gap-3 text-xs text-gray-600">
+      <div className="mt-2 flex gap-3 tx-meta">
         <span>{meal.totalKcal} kcal</span>
         <span>P: {meal.totalProtein}g</span>
         <span>F: {meal.totalFat}g</span>

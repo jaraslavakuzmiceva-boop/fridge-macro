@@ -18,12 +18,12 @@ export function InventoryItemRow({ item, product, onEdit, onRemove }: Props) {
     <div className="px-card flex items-center justify-between p-3">
       <div className="flex-1 min-w-0">
         <div className="flex items-center gap-2">
-          <span className="text-sm font-medium text-gray-800 truncate">
+          <span className="tx-body font-medium truncate">
             {product?.name ?? 'Unknown'}
           </span>
           <ExpirationBadge status={status} />
         </div>
-        <div className="text-sm text-gray-600 mt-0.5">
+        <div className="tx-secondary mt-0.5">
           {item.quantity} {item.unit} · {item.storageLocation}
         </div>
       </div>

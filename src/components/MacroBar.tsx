@@ -14,7 +14,7 @@ export function MacroBar({ label, current, target, unit }: MacroBarProps) {
     <div className="mb-3">
       <div className="flex justify-between mb-1">
         <span className="px-label">{label}</span>
-        <span className={`text-xs ${isOver ? 'neon-red' : 'text-gray-600'}`}>
+        <span className={`tx-meta ${isOver ? 'neon-red' : ''}`}>
           {isOver && '[!!] '}
           {Math.round(current)}/{target}{unit}
           {!isOver && ` (${Math.round(remaining)} left)`}

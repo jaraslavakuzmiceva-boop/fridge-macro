@@ -23,7 +23,7 @@ export function ForecastScreen() {
     return generateForecast(inventory, productMap, settings);
   }, [inventory, productMap, settings]);
 
-  if (!settings || !forecast) return <div className="p-4 text-gray-600">Loading...</div>;
+  if (!settings || !forecast) return <div className="p-4 tx-secondary">Loading...</div>;
 
   const tierBorderColor = {
     green:  '#22a83e',
@@ -46,33 +46,33 @@ export function ForecastScreen() {
           <TierBadge tier={forecast.tier} />
           <span className="px-label">Overall Status</span>
         </div>
-        <p className="text-sm text-gray-700">{tierMessages[forecast.tier]}</p>
+        <p className="tx-body">{tierMessages[forecast.tier]}</p>
       </div>
 
       <h2 className="px-label mb-3">Simulated Meals ({forecast.meals.length}/3)</h2>
 
       {forecast.meals.length === 0 && (
-        <p className="text-sm text-gray-600 mb-4">No meals could be generated from tomorrow's inventory.</p>
+        <p className="tx-secondary mb-4">No meals could be generated from tomorrow's inventory.</p>
       )}
 
       <div className="space-y-3 mb-6">
         {forecast.meals.map((meal, idx) => (
           <div key={idx} className="px-card p-3">
             <div className="flex items-center gap-2 mb-2">
-              <span className="text-sm text-gray-800">Meal {idx + 1}</span>
+              <span className="tx-body">Meal {idx + 1}</span>
               <TierBadge tier={meal.tier} />
             </div>
             <div className="space-y-1 mb-2">
               {meal.items.map((item, i) => {
                 const product = productMap.get(item.productId);
                 return (
-                  <div key={i} className="text-sm text-gray-700">
+                  <div key={i} className="tx-body">
                     {product?.name ?? 'Unknown'} — {item.quantity} {item.unit}
                   </div>
                 );
               })}
             </div>
-            <div className="flex gap-3 text-xs text-gray-600">
+            <div className="flex gap-3 tx-meta">
               <span>{meal.totalKcal} kcal</span>
               <span>P: {meal.totalProtein}g</span>
               <span>F: {meal.totalFat}g</span>
@@ -96,7 +96,7 @@ export function ForecastScreen() {
                   </span>
                   <div>
                     <span className="px-label neon-yellow">{suggestion.reason}</span>
-                    <p className="text-sm text-gray-700 mt-0.5">{suggestion.message}</p>
+                    <p className="tx-body mt-0.5">{suggestion.message}</p>
                   </div>
                 </div>
               </div>
