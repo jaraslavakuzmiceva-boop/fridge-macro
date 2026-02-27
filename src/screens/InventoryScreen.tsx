@@ -80,7 +80,7 @@ export function InventoryScreen() {
 
       {showAdd && (
         <AddEditModal
-          products={allProducts}
+          products={allProducts ?? []}
           editItem={editItem}
           onSave={async (data) => {
             if (editItem?.id) {
