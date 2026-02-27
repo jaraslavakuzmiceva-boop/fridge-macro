@@ -126,14 +126,12 @@ export function AddManualMealModal({ products, onLog, onClose }: Props) {
   const [quantity, setQuantity] = useState('100');
   const [unit, setUnit] = useState<'g' | 'ml' | 'pieces'>('g');
   const [search, setSearch] = useState('');
-  const [speechLang, setSpeechLang] = useState<'en-US' | 'ru-RU'>(() => {
-    if (typeof navigator !== 'undefined' && /ru/i.test(navigator.language)) return 'ru-RU';
-    return 'en-US';
-  });
+  const [speechLang, setSpeechLang] = useState<'en-US' | 'ru-RU'>('ru-RU');
   const [transcript, setTranscript] = useState('');
   const [isListening, setIsListening] = useState(false);
   const [speechError, setSpeechError] = useState<string | null>(null);
   const recognitionRef = useRef<SpeechRecognitionLike | null>(null);
+  const gotResultRef = useRef(false);
 
   const filteredProducts = useMemo(() => {
     const q = search.trim();
@@ -159,36 +157,46 @@ export function AddManualMealModal({ products, onLog, onClose }: Props) {
 
   function applyRussianAliases(input: string): string {
     const aliases: Array<[RegExp, string]> = [
-      [/\bяйц(о|а|ы)?\b/g, 'eggs'],
-      [/\bкуриц(а|ы)?\b|\bкурин(ая|ые)?\b/g, 'chicken'],
       [/\bкурин(ая|ые)?\s+грудк(а|и)?\b/g, 'chicken breast'],
-      [/\bрис\b/g, 'rice'],
-      [/\bовсян(ка|ые хлопья)?\b/g, 'oats'],
+      [/\bрис\b|\bрис\s*бел(ый|ого|ый)\b/g, 'rice (white)'],
+      [/\bяйц(о|а|ы)?\b/g, 'eggs'],
       [/\bброкколи\b/g, 'broccoli'],
-      [/\bлосос(ь|я)\b/g, 'salmon'],
-      [/\bмолок(о|а)\b/g, 'milk'],
-      [/\bхлеб\b/g, 'bread'],
+      [/\bлосос(ь|я)\b|\bсемг(а|и)?\b/g, 'salmon'],
+      [/\bгреческ(ий|ого|ая)?\s+йогурт\b|\bйогурт\s+греческ(ий|ого|ая)?\b/g, 'greek yogurt'],
+      [/\bовсян(ка|ые хлопья)?\b/g, 'oats'],
+      [/\bбанан(ы|а)?\b/g, 'banana'],
+      [/\bоливков(ое|ого)?\s+масл(о|а)?\b|\bмасл(о|а)?\s+оливков(ое|ого)?\b/g, 'olive oil'],
+      [/\bбатат\b|\bсладк(ий|ого)?\s+картофел(ь|я)\b/g, 'sweet potato'],
+      [/\bтворог\b|\bтворожн(ый|ого)?\s+сыр\b/g, 'cottage cheese'],
+      [/\bминдал(ь|я)?\b/g, 'almonds'],
+      [/\bговяж(ий|его)?\s+фарш\b|\bфарш\s+говяж(ий|его)?\b/g, 'ground beef (lean)'],
+      [/\bмакарон(ы|ов|а)?\b|\bпаста\b/g, 'pasta'],
       [/\bпомидор(ы|а)?\b|\bтомат(ы|а)?\b/g, 'tomatoes'],
       [/\bавокадо\b/g, 'avocado'],
+      [/\bмолок(о|а)\b/g, 'milk (2%)'],
+      [/\bхлеб\b|\bцельнозернов(ой|ого)?\s+хлеб\b/g, 'bread (whole wheat)'],
+      [/\bиндейк(а|и)?\b|\bгрудк(а|и)?\s+индейк(и|а)?\b/g, 'turkey breast'],
       [/\bшпинат\b/g, 'spinach'],
-      [/\bиндейк(а|и)?\b/g, 'turkey breast'],
+      [/\bкуриц(а|ы)?\b|\bкурин(ая|ые)?\b/g, 'chicken breast'],
     ];
     let out = input;
     for (const [re, rep] of aliases) out = out.replace(re, rep);
     return out;
   }
 
-  function detectLang(text: string): 'en-US' | 'ru-RU' {
-    return /[а-яё]/i.test(text) ? 'ru-RU' : 'en-US';
-  }
-
   function parseSpeechToEntries(text: string, lang: 'en-US' | 'ru-RU'): ManualEntry[] {
-    const normalized = text
+    let normalized = text
       .toLowerCase()
       .replace(/([,;])/g, ' $1 ')
       .replace(/\s+/g, ' ')
       .trim();
     if (!normalized) return [];
+
+    if (lang === 'ru-RU') {
+      normalized = normalized.replace(/\b(я|съел(а)?|поел(а)?|ел(а)?|ем|кушал(а)?|сегодня|вчера|на|завтрак|обед|ужин)\b/g, '').trim();
+    } else {
+      normalized = normalized.replace(/\b(i|ate|had|for|breakfast|lunch|dinner|today|yesterday)\b/g, '').trim();
+    }
 
     const numberWords: Record<string, number> = {
       one: 1, two: 2, three: 3, four: 4, five: 5,
@@ -199,7 +207,20 @@ export function AddManualMealModal({ products, onLog, onClose }: Props) {
       пол: 0.5,
     };
 
-    const segments = normalized.split(/\s+(and|,)\s+/).filter(s => s !== 'and' && s !== ',');
+    let segments = normalized
+      .split(/\s+(and|,|и|then|plus)\s+/)
+      .filter(s => !['and', ',', 'и', 'then', 'plus'].includes(s));
+
+    if (segments.length <= 1) {
+      const unitPattern = '(?:kg|kilogram(?:s)?|кг|килограмм(?:а|ов)?|l|liter(?:s)?|л|литр(?:а|ов)?|g|gram(?:s)?|г|гр|грамм(?:а|ов)?|ml|milliliter(?:s)?|мл|миллилитр(?:а|ов)?|pcs?|pieces?|шт|штук(?:а|и)?|штуки|egg(?:s)?|яйц(?:о|а|ы)?)';
+      const re = new RegExp(`(\\d+(?:\\.\\d+)?|one|two|three|four|five|six|seven|eight|nine|ten|half|один|одна|два|две|три|четыре|пять|шесть|семь|восемь|девять|десять|пол)\\s*${unitPattern}\\s+([^\\d]+?)(?=(\\d+|one|two|three|four|five|six|seven|eight|nine|ten|half|один|одна|два|две|три|четыре|пять|шесть|семь|восемь|девять|десять|пол)\\s*${unitPattern}|$)`, 'g');
+      const extracted: string[] = [];
+      let match: RegExpExecArray | null;
+      while ((match = re.exec(normalized)) !== null) {
+        extracted.push(`${match[1]} ${match[2]}`.trim());
+      }
+      if (extracted.length > 0) segments = extracted;
+    }
     const results: ManualEntry[] = [];
 
     for (const seg of segments) {
@@ -268,11 +289,11 @@ export function AddManualMealModal({ products, onLog, onClose }: Props) {
       return;
     }
     setSpeechError(null);
+    gotResultRef.current = false;
     const recognition: SpeechRecognitionLike = new SpeechRecognitionCtor();
-    const inferred = detectLang(transcript);
-    recognition.lang = transcript.trim() ? inferred : speechLang;
+    recognition.lang = speechLang;
     recognition.interimResults = true;
-    recognition.continuous = false;
+    recognition.continuous = true;
     recognition.onresult = event => {
       let finalText = '';
       let interimText = '';
@@ -281,6 +302,7 @@ export function AddManualMealModal({ products, onLog, onClose }: Props) {
         if (result.isFinal) finalText += result[0].transcript + ' ';
         else interimText += result[0].transcript + ' ';
       }
+      if ((finalText + interimText).trim()) gotResultRef.current = true;
       setTranscript((finalText + interimText).trim());
     };
     recognition.onerror = () => {
@@ -289,8 +311,8 @@ export function AddManualMealModal({ products, onLog, onClose }: Props) {
     };
     recognition.onend = () => {
       setIsListening(false);
-      if (!transcript.trim()) {
-        setSpeechError('No speech detected. Try again or switch device language to RU/EN.');
+      if (!gotResultRef.current && !transcript.trim()) {
+        setSpeechError('No speech detected. Try again or check mic access.');
       }
     };
     recognitionRef.current = recognition;
@@ -303,9 +325,7 @@ export function AddManualMealModal({ products, onLog, onClose }: Props) {
   }
 
   function handleSpeechAdd() {
-    const lang = detectLang(transcript);
-    setSpeechLang(lang);
-    const parsed = parseSpeechToEntries(transcript, lang);
+    const parsed = parseSpeechToEntries(transcript, speechLang);
     if (parsed.length === 0) return;
     setEntries(prev => [...prev, ...parsed]);
     setTranscript('');
@@ -463,16 +483,45 @@ export function AddManualMealModal({ products, onLog, onClose }: Props) {
             {/* Speech to text */}
             <div className="space-y-2">
               <div className="flex items-center gap-2">
-                <button
-                  type="button"
-                  onClick={isListening ? stopSpeech : startSpeech}
-                  className={`px-3 py-2 rounded-lg text-sm font-semibold transition-colors ${
-                    isListening ? 'bg-emerald-600 text-white' : 'bg-emerald-100 text-emerald-700'
-                  }`}
-                >
-                  {isListening ? 'Listening…' : 'Speak Meal'}
-                </button>
-                <span className="text-xs text-gray-400">Auto-detects EN/RU</span>
+                <div className="flex rounded-lg border border-gray-200 overflow-hidden">
+                  <button
+                    type="button"
+                    onClick={() => setSpeechLang('ru-RU')}
+                    className={`px-2 py-2 text-xs font-semibold ${
+                      speechLang === 'ru-RU' ? 'bg-emerald-600 text-white' : 'bg-white text-gray-500'
+                    }`}
+                  >
+                    RU
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => setSpeechLang('en-US')}
+                    className={`px-2 py-2 text-xs font-semibold ${
+                      speechLang === 'en-US' ? 'bg-emerald-600 text-white' : 'bg-white text-gray-500'
+                    }`}
+                  >
+                    EN
+                  </button>
+                </div>
+                <div className="flex gap-2">
+                  <button
+                    type="button"
+                    onClick={startSpeech}
+                    disabled={isListening}
+                    className="px-3 py-2 rounded-lg text-sm font-semibold bg-emerald-100 text-emerald-700 disabled:bg-gray-200 disabled:text-gray-400 transition-colors"
+                  >
+                    Start
+                  </button>
+                  <button
+                    type="button"
+                    onClick={stopSpeech}
+                    disabled={!isListening}
+                    className="px-3 py-2 rounded-lg text-sm font-semibold bg-emerald-600 text-white disabled:bg-gray-200 disabled:text-gray-400 transition-colors"
+                  >
+                    Stop
+                  </button>
+                </div>
+                <span className="text-xs text-gray-400">Choose language</span>
               </div>
               {speechError && (
                 <p className="text-xs text-red-500">{speechError}</p>
