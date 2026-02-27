@@ -14,15 +14,16 @@ export function MacroBar({ label, current, target, unit }: MacroBarProps) {
     <div className="mb-3">
       <div className="flex justify-between text-sm mb-1">
         <span className="font-medium text-gray-700">{label}</span>
-        <span className={`text-xs ${isOver ? 'text-red-600 font-bold' : 'text-gray-500'}`}>
+        <span className={`text-xs flex items-center gap-1 ${isOver ? 'text-red-500 font-semibold' : 'text-gray-500'}`}>
+          {isOver && <span>⚠️</span>}
           {Math.round(current)} / {target} {unit}
           {!isOver && ` (${Math.round(remaining)} left)`}
-          {isOver && ' (over!)'}
+          {isOver && ' over!'}
         </span>
       </div>
       <div className="w-full bg-gray-200 rounded-full h-3">
         <div
-          className={`h-3 rounded-full transition-all duration-300 ${isOver ? 'bg-emerald-700' : 'bg-emerald-500'}`}
+          className={`h-3 rounded-full transition-all duration-300 ${isOver ? 'bg-red-500' : 'bg-emerald-500'}`}
           style={{ width: `${pct}%` }}
         />
       </div>

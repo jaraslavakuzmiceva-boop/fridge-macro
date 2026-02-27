@@ -20,6 +20,13 @@ export function TodayScreen() {
   const { items: inventory, deductItems } = useInventory();
   const [showSuggestions, setShowSuggestions] = useState(false);
   const [showManualEntry, setShowManualEntry] = useState(false);
+  const [isGenerating, setIsGenerating] = useState(false);
+  const [toast, setToast] = useState<string | null>(null);
+
+  function showToast(msg: string) {
+    setToast(msg);
+    setTimeout(() => setToast(null), 2500);
+  }
 
   const allProducts = useLiveQuery(() => db.products.toArray()) ?? [];
   const productMap = useMemo(() => {
@@ -70,6 +77,7 @@ export function TodayScreen() {
     const sources = await deductItems(meal.items.map(i => ({ productId: i.productId, quantity: i.quantity, unit: i.unit })));
     await logMeal({ ...meal, sources });
     setShowSuggestions(false);
+    showToast('Meal logged! 🎉');
   }
 
   async function handleLogManualMeal(
@@ -86,6 +94,15 @@ export function TodayScreen() {
       totalSimpleCarbs: totals.simpleCarbs,
     });
     setShowManualEntry(false);
+    showToast('Meal logged! 🎉');
+  }
+
+  function handleGenerateMeal() {
+    setIsGenerating(true);
+    setTimeout(() => {
+      setIsGenerating(false);
+      setShowSuggestions(true);
+    }, 400);
   }
 
   if (!settings) return <div className="p-4 text-gray-500">Loading...</div>;
@@ -96,6 +113,11 @@ export function TodayScreen() {
 
   return (
     <div className="p-4 pb-24 max-w-lg mx-auto">
+      {toast && (
+        <div className="fixed top-4 left-1/2 -translate-x-1/2 z-50 bg-gray-800 text-white text-sm font-medium px-4 py-2.5 rounded-xl shadow-lg animate-fade-in">
+          {toast}
+        </div>
+      )}
       <h1 className="text-xl font-bold text-gray-800 mb-4">Today</h1>
 
       <div className="bg-white rounded-xl p-4 shadow-sm border border-gray-100 mb-4">
@@ -115,10 +137,19 @@ export function TodayScreen() {
 
       <div className="flex gap-2 mb-4">
         <button
-          onClick={() => setShowSuggestions(true)}
-          className="flex-1 py-3 bg-emerald-500 text-white rounded-xl font-semibold text-base hover:bg-emerald-600 transition-colors shadow-sm"
+          onClick={handleGenerateMeal}
+          disabled={isGenerating}
+          className="flex-1 py-3 bg-emerald-500 text-white rounded-xl font-semibold text-base hover:bg-emerald-600 transition-colors shadow-sm disabled:opacity-70 flex items-center justify-center gap-2"
         >
-          Generate Next Meal
+          {isGenerating ? (
+            <>
+              <svg className="w-4 h-4 animate-spin" fill="none" viewBox="0 0 24 24">
+                <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
+                <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v4l3-3-3-3v4a8 8 0 100 16v-4l-3 3 3 3v-4a8 8 0 01-8-8z" />
+              </svg>
+              Generating…
+            </>
+          ) : 'Generate Next Meal'}
         </button>
         <button
           onClick={() => setShowManualEntry(true)}

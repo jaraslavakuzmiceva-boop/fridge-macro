@@ -1,3 +1,4 @@
+import { useState } from 'react';
 import type { Meal, Product } from '../models/types';
 
 interface Props {
@@ -7,6 +8,8 @@ interface Props {
 }
 
 export function MealCard({ meal, products, onDelete }: Props) {
+  const [confirming, setConfirming] = useState(false);
+
   return (
     <div className="p-3 bg-white rounded-lg shadow-sm border border-gray-100">
       <div className="flex justify-between items-start">
@@ -14,12 +17,30 @@ export function MealCard({ meal, products, onDelete }: Props) {
           {new Date(meal.createdAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
         </div>
         {onDelete && meal.id && (
-          <button
-            onClick={() => onDelete(meal)}
-            className="text-gray-400 hover:text-red-500 text-xs"
-          >
-            Remove
-          </button>
+          confirming ? (
+            <div className="flex items-center gap-2">
+              <span className="text-xs text-gray-500">Remove?</span>
+              <button
+                onClick={() => onDelete(meal)}
+                className="text-xs font-semibold text-red-500 hover:text-red-700"
+              >
+                Yes
+              </button>
+              <button
+                onClick={() => setConfirming(false)}
+                className="text-xs text-gray-400 hover:text-gray-600"
+              >
+                No
+              </button>
+            </div>
+          ) : (
+            <button
+              onClick={() => setConfirming(true)}
+              className="text-gray-400 hover:text-red-500 text-xs transition-colors"
+            >
+              Remove
+            </button>
+          )
         )}
       </div>
       <div className="mt-1 space-y-0.5">
