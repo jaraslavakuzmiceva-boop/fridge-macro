@@ -566,7 +566,7 @@ export function AddManualMealModal({ products, onLog, onClose }: Props) {
                   setShowDropdown(true);
                 }}
                 onFocus={() => setShowDropdown(true)}
-                className="px-input"
+                className="px-input tx-body"
               />
               {showDropdown && filteredProducts.length > 0 && (
                 <div className="absolute z-10 w-full mt-1 px-card max-h-48 overflow-y-auto" style={{ top: '100%' }}>
