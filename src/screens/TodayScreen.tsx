@@ -77,7 +77,7 @@ export function TodayScreen() {
     const sources = await deductItems(meal.items.map(i => ({ productId: i.productId, quantity: i.quantity, unit: i.unit })));
     await logMeal({ ...meal, sources });
     setShowSuggestions(false);
-    showToast('Meal logged! 🎉');
+    showToast('Meal logged!');
   }
 
   async function handleLogManualMeal(
@@ -94,7 +94,7 @@ export function TodayScreen() {
       totalSimpleCarbs: totals.simpleCarbs,
     });
     setShowManualEntry(false);
-    showToast('Meal logged! 🎉');
+    showToast('Meal logged!');
   }
 
   function handleGenerateMeal() {
@@ -105,41 +105,41 @@ export function TodayScreen() {
     }, 400);
   }
 
-  if (!settings) return <div className="p-4 text-emerald-400">Loading...</div>;
+  if (!settings) return <div className="p-4 text-gray-600">Loading...</div>;
 
   const simpleCarbPct = consumed.kcal > 0
     ? ((consumed.simpleCarbs * 4) / consumed.kcal * 100)
     : 0;
 
   return (
-    <div className="p-4 pb-24 max-w-lg mx-auto bg-black min-h-screen text-white">
+    <div className="p-4 pb-24 max-w-lg mx-auto">
       {toast && (
-        <div className="fixed top-4 left-1/2 -translate-x-1/2 z-50 bg-black text-emerald-200 text-sm font-medium px-4 py-2.5 rounded-xl border border-emerald-800 shadow-[0_0_0_1px_rgba(16,185,129,0.1)] animate-fade-in">
+        <div className="fixed top-4 left-1/2 -translate-x-1/2 z-50 px-card px-4 py-2 neon-green text-sm">
           {toast}
         </div>
       )}
-      <h1 className="text-xl font-bold text-white mb-4">Today</h1>
+      <h1 className="mb-4">Today</h1>
 
-      <div className="bg-black rounded-xl p-4 border border-emerald-900/40 shadow-[0_0_0_1px_rgba(16,185,129,0.08)] mb-4">
+      <div className="px-card p-4 mb-4">
         <MacroBar label="Calories" current={consumed.kcal} target={settings.dailyKcal} unit="kcal" />
         <MacroBar label="Protein" current={consumed.protein} target={settings.dailyProtein} unit="g" />
         <MacroBar label="Fat" current={consumed.fat} target={settings.dailyFat} unit="g" />
         <MacroBar label="Carbs" current={consumed.carbs} target={settings.dailyCarbs} unit="g" />
 
         <div className="mt-2 flex items-center gap-2">
-          <span className="text-xs text-emerald-400">Simple carbs:</span>
-          <span className={`text-xs font-medium ${simpleCarbPct > settings.simpleCarbLimitPercent ? 'text-rose-400' : 'text-emerald-400'}`}>
+          <span className="px-label">Simple carbs:</span>
+          <span className={`text-xs ${simpleCarbPct > settings.simpleCarbLimitPercent ? 'neon-red' : 'text-gray-600'}`}>
             {simpleCarbPct.toFixed(1)}% of kcal
-            {simpleCarbPct > settings.simpleCarbLimitPercent && ' (over limit!)'}
+            {simpleCarbPct > settings.simpleCarbLimitPercent && ' [over limit!]'}
           </span>
         </div>
       </div>
 
-      <div className="flex gap-2 mb-4">
+      <div className="flex gap-3 mb-4">
         <button
           onClick={handleGenerateMeal}
           disabled={isGenerating}
-          className="flex-1 py-3 bg-emerald-500 text-black rounded-xl font-semibold text-base hover:bg-emerald-400 transition-colors shadow-sm disabled:opacity-50 flex items-center justify-center gap-2"
+          className="px-btn flex-1"
         >
           {isGenerating ? (
             <>
@@ -147,27 +147,22 @@ export function TodayScreen() {
                 <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
                 <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v4l3-3-3-3v4a8 8 0 100 16v-4l-3 3 3 3v-4a8 8 0 01-8-8z" />
               </svg>
-              Generating…
+              Generating...
             </>
           ) : 'Generate Meal'}
         </button>
         <button
           onClick={() => setShowManualEntry(true)}
-          className="flex-1 py-3 bg-black text-emerald-500 border border-emerald-500 rounded-xl font-semibold text-base hover:bg-emerald-900/30 transition-colors shadow-sm"
+          className="px-btn-outline flex-1"
         >
-          Add
+          Add Manually
         </button>
       </div>
 
       <div className="space-y-3">
-        <h2
-          className="text-sm font-semibold uppercase tracking-wide"
-          style={{ textShadow: 'none', backgroundColor: 'transparent', color: 'rgb(16 185 129)' }}
-        >
-          Today's Meals ({todayMeals.length})
-        </h2>
+        <h2 className="px-label">Today's Meals ({todayMeals.length})</h2>
         {todayMeals.length === 0 && (
-          <p className="text-sm text-emerald-400">No meals logged yet. Generate your first meal!</p>
+          <p className="text-sm text-gray-600">No meals logged yet. Generate your first meal!</p>
         )}
         {todayMeals.map(meal => (
           <MealCard key={meal.id} meal={meal} products={productMap} onDelete={deleteMeal} />

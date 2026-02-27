@@ -4,11 +4,11 @@ import { useSettings } from '../hooks/useSettings';
 export function SettingsScreen() {
   const { settings, updateSettings } = useSettings();
 
-  if (!settings) return <div className="p-4 text-emerald-300">Loading...</div>;
+  if (!settings) return <div className="p-4 text-gray-600">Loading...</div>;
 
   return (
     <div className="p-4 pb-24 max-w-lg mx-auto">
-      <h1 className="text-xl font-bold text-white mb-4">Settings</h1>
+      <h1 className="mb-4">Settings</h1>
       <SettingsForm key={settings.id ?? 'settings'} settings={settings} onSave={updateSettings} />
     </div>
   );
@@ -52,68 +52,37 @@ function SettingsForm({
 
   return (
     <form onSubmit={handleSave}>
-      <div className="bg-black rounded-xl p-4 border border-emerald-900/40 shadow-[0_0_0_1px_rgba(16,185,129,0.12)] mb-4">
-        <h2 className="text-sm font-semibold text-emerald-300 uppercase tracking-wide mb-3">Daily Macro Goals</h2>
+      <div className="px-card p-4 mb-4">
+        <h2 className="px-label mb-3">Daily Macro Goals</h2>
 
         <div className="space-y-3">
-          <div>
-            <label className="block text-sm font-medium text-emerald-200 mb-1">Calories (kcal)</label>
-            <input
-              type="number"
-              value={kcal}
-              onChange={e => setKcal(e.target.value)}
-              min="0"
-              step="any"
-              className="w-full border border-emerald-900/40 bg-black text-white rounded-lg px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500"
-            />
-          </div>
-
-          <div>
-            <label className="block text-sm font-medium text-emerald-200 mb-1">Protein (g)</label>
-            <input
-              type="number"
-              value={protein}
-              onChange={e => setProtein(e.target.value)}
-              min="0"
-              step="any"
-              className="w-full border border-emerald-900/40 bg-black text-white rounded-lg px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500"
-            />
-          </div>
-
-          <div>
-            <label className="block text-sm font-medium text-emerald-200 mb-1">Fat (g)</label>
-            <input
-              type="number"
-              value={fat}
-              onChange={e => setFat(e.target.value)}
-              min="0"
-              step="any"
-              className="w-full border border-emerald-900/40 bg-black text-white rounded-lg px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500"
-            />
-          </div>
-
-          <div>
-            <label className="block text-sm font-medium text-emerald-200 mb-1">Carbs (g)</label>
-            <input
-              type="number"
-              value={carbs}
-              onChange={e => setCarbs(e.target.value)}
-              min="0"
-              step="any"
-              className="w-full border border-emerald-900/40 bg-black text-white rounded-lg px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500"
-            />
-          </div>
+          {[
+            { label: 'Calories (kcal)', value: kcal, setter: setKcal },
+            { label: 'Protein (g)',     value: protein, setter: setProtein },
+            { label: 'Fat (g)',         value: fat, setter: setFat },
+            { label: 'Carbs (g)',       value: carbs, setter: setCarbs },
+          ].map(({ label, value, setter }) => (
+            <div key={label}>
+              <label className="px-label block mb-1">{label}</label>
+              <input
+                type="number"
+                value={value}
+                onChange={e => setter(e.target.value)}
+                min="0"
+                step="any"
+                className="px-input"
+              />
+            </div>
+          ))}
         </div>
       </div>
 
-      <div className="bg-black rounded-xl p-4 border border-emerald-900/40 shadow-[0_0_0_1px_rgba(16,185,129,0.12)] mb-4">
-        <h2 className="text-sm font-semibold text-emerald-300 uppercase tracking-wide mb-3">Preferences</h2>
+      <div className="px-card p-4 mb-4">
+        <h2 className="px-label mb-3">Preferences</h2>
 
         <div className="space-y-3">
           <div>
-            <label className="block text-sm font-medium text-emerald-200 mb-1">
-              Simple Carb Limit (% of daily kcal)
-            </label>
+            <label className="px-label block mb-1">Simple Carb Limit (% of daily kcal)</label>
             <input
               type="number"
               value={simpleCarbLimit}
@@ -121,23 +90,19 @@ function SettingsForm({
               min="0"
               max="100"
               step="1"
-              className="w-full border border-emerald-900/40 bg-black text-white rounded-lg px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500"
+              className="px-input"
             />
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-emerald-200 mb-1">Meals per Day</label>
+            <label className="px-label block mb-1">Meals per Day</label>
             <div className="flex gap-2">
               {[2, 3, 4, 5, 6].map(n => (
                 <button
                   key={n}
                   type="button"
                   onClick={() => setMealsPerDay(n.toString())}
-                  className={`flex-1 py-2.5 rounded-lg text-sm font-medium transition-colors ${
-                    parseInt(mealsPerDay) === n
-                      ? 'bg-emerald-500 text-white'
-                      : 'bg-black text-emerald-300'
-                  }`}
+                  className={`px-tab${parseInt(mealsPerDay) === n ? ' active' : ''}`}
                 >
                   {n}
                 </button>
@@ -147,10 +112,7 @@ function SettingsForm({
         </div>
       </div>
 
-      <button
-        type="submit"
-        className="w-full py-3 bg-emerald-500 text-white rounded-xl font-semibold text-base hover:bg-emerald-600 transition-colors shadow-sm"
-      >
+      <button type="submit" className="px-btn">
         {saved ? 'Saved!' : 'Save Settings'}
       </button>
     </form>

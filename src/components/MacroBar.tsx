@@ -12,18 +12,18 @@ export function MacroBar({ label, current, target, unit }: MacroBarProps) {
 
   return (
     <div className="mb-3">
-      <div className="flex justify-between text-sm mb-1">
-        <span className="font-medium text-white">{label}</span>
-        <span className={`text-xs flex items-center gap-1 ${isOver ? 'text-rose-400 font-semibold' : 'text-emerald-400'}`}>
-          {isOver && <span>⚠️</span>}
-          {Math.round(current)} / {target} {unit}
+      <div className="flex justify-between mb-1">
+        <span className="px-label">{label}</span>
+        <span className={`text-xs ${isOver ? 'neon-red' : 'text-gray-600'}`}>
+          {isOver && '[!!] '}
+          {Math.round(current)}/{target}{unit}
           {!isOver && ` (${Math.round(remaining)} left)`}
-          {isOver && ' over!'}
+          {isOver && ' OVER'}
         </span>
       </div>
-      <div className="w-full bg-emerald-900/60 rounded-full h-3">
+      <div className="px-bar-track">
         <div
-          className={`h-3 rounded-full transition-all duration-300 ${isOver ? 'bg-rose-500' : 'bg-emerald-500'}`}
+          className={`px-bar-fill${isOver ? ' danger' : ''}`}
           style={{ width: `${pct}%` }}
         />
       </div>

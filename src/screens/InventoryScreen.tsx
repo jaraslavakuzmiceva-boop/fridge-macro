@@ -18,7 +18,6 @@ export function InventoryScreen() {
   const [showAdd, setShowAdd] = useState(false);
   const [editItem, setEditItem] = useState<InventoryItem | null>(null);
 
-  // Group by storage location
   const grouped = useMemo(() => {
     const groups: Record<StorageLocation, InventoryItem[]> = { fridge: [], freezer: [], pantry: [] };
     for (const item of items) {
@@ -36,21 +35,21 @@ export function InventoryScreen() {
   return (
     <div className="p-4 pb-24 max-w-lg mx-auto">
       <div className="flex justify-between items-center mb-4">
-        <h1 className="text-xl font-bold text-white">Inventory</h1>
-        <Link to="/products" className="text-sm text-emerald-300 font-medium hover:text-emerald-200">
+        <h1>Inventory</h1>
+        <Link to="/products" className="px-btn-text">
           Manage Products
         </Link>
       </div>
 
       <button
         onClick={() => { setShowAdd(true); setEditItem(null); }}
-        className="w-full py-2.5 bg-emerald-500 text-white rounded-xl font-medium mb-4 hover:bg-emerald-600 transition-colors"
+        className="px-btn mb-4"
       >
         + Add Item
       </button>
 
       {items.length === 0 && (
-        <p className="text-sm text-emerald-400 text-center py-8">
+        <p className="text-sm text-gray-600 text-center py-8">
           Your fridge is empty. Add some items!
         </p>
       )}
@@ -60,9 +59,7 @@ export function InventoryScreen() {
         if (group.length === 0) return null;
         return (
           <div key={loc} className="mb-4">
-            <h2 className="text-sm font-semibold text-emerald-300 uppercase tracking-wide mb-2">
-              {locationLabels[loc]} ({group.length})
-            </h2>
+            <h2 className="px-label mb-2">{locationLabels[loc]} ({group.length})</h2>
             <div className="space-y-2">
               {group.map(item => (
                 <InventoryItemRow
@@ -115,7 +112,6 @@ function AddEditModal({
   const [location, setLocation] = useState<StorageLocation>(editItem?.storageLocation ?? 'fridge');
   const [expDate, setExpDate] = useState(editItem?.expirationDate ?? getDefaultExpDate());
 
-  // Update unit when product changes
   const selectedProduct = products.find(p => p.id === productId);
 
   function getDefaultExpDate() {
@@ -142,22 +138,20 @@ function AddEditModal({
   }
 
   return (
-    <div className="fixed inset-0 bg-black/50 flex items-end sm:items-center justify-center z-50 p-4">
-      <form onSubmit={handleSubmit} className="bg-black rounded-t-2xl sm:rounded-2xl w-full max-w-md p-6 border border-emerald-500 shadow-[0_0_0_1px_rgba(16,185,129,0.35)]">
+    <div className="fixed inset-0 bg-black/70 flex items-end sm:items-center justify-center z-50 p-4">
+      <form onSubmit={handleSubmit} className="px-card w-full max-w-md p-6">
         <div className="flex justify-between items-center mb-4">
-          <h3 className="text-lg font-semibold text-white">
-            {editItem ? 'Edit Item' : 'Add Item'}
-          </h3>
-          <button type="button" onClick={onClose} className="text-emerald-400 hover:text-emerald-300 text-xl">&times;</button>
+          <h3>{editItem ? 'Edit Item' : 'Add Item'}</h3>
+          <button type="button" onClick={onClose} className="px-btn-text text-xl leading-none">&times;</button>
         </div>
 
         {!editItem && (
           <div className="mb-3">
-            <label className="block text-sm font-medium text-emerald-200 mb-1">Product</label>
+            <label className="px-label block mb-1">Product</label>
             <select
               value={productId}
               onChange={e => handleProductChange(Number(e.target.value))}
-              className="w-full border border-emerald-900/40 bg-black text-white rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500"
+              className="px-input"
             >
               {products.map(p => (
                 <option key={p.id} value={p.id}>{p.name}</option>
@@ -168,22 +162,22 @@ function AddEditModal({
 
         <div className="grid grid-cols-2 gap-3 mb-3">
           <div>
-            <label className="block text-sm font-medium text-emerald-200 mb-1">Quantity</label>
+            <label className="px-label block mb-1">Quantity</label>
             <input
               type="number"
               value={quantity}
               onChange={e => setQuantity(e.target.value)}
               min="0"
               step="any"
-              className="w-full border border-emerald-900/40 bg-black text-white rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500"
+              className="px-input"
             />
           </div>
           <div>
-            <label className="block text-sm font-medium text-emerald-200 mb-1">Unit</label>
+            <label className="px-label block mb-1">Unit</label>
             <select
               value={unit}
               onChange={e => setUnit(e.target.value as 'g' | 'ml' | 'pieces')}
-              className="w-full border border-emerald-900/40 bg-black text-white rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500"
+              className="px-input"
             >
               <option value="g">grams</option>
               <option value="ml">ml</option>
@@ -193,16 +187,14 @@ function AddEditModal({
         </div>
 
         <div className="mb-3">
-          <label className="block text-sm font-medium text-emerald-200 mb-1">Storage</label>
+          <label className="px-label block mb-1">Storage</label>
           <div className="flex gap-2">
             {(['fridge', 'freezer', 'pantry'] as StorageLocation[]).map(loc => (
               <button
                 key={loc}
                 type="button"
                 onClick={() => setLocation(loc)}
-                className={`flex-1 py-2 rounded-lg text-sm font-medium transition-colors ${
-                  location === loc ? 'bg-emerald-500 text-white' : 'bg-black text-emerald-300'
-                }`}
+                className={`px-tab${location === loc ? ' active' : ''}`}
               >
                 {loc.charAt(0).toUpperCase() + loc.slice(1)}
               </button>
@@ -211,25 +203,22 @@ function AddEditModal({
         </div>
 
         <div className="mb-4">
-          <label className="block text-sm font-medium text-emerald-200 mb-1">Expiration Date</label>
+          <label className="px-label block mb-1">Expiration Date</label>
           <input
             type="date"
             value={expDate}
             onChange={e => setExpDate(e.target.value)}
-            className="w-full border border-emerald-900/40 bg-black text-white rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500"
+            className="px-input"
           />
         </div>
 
         {selectedProduct && (
-          <div className="mb-4 text-xs text-emerald-400">
+          <div className="mb-4 text-xs text-gray-600">
             Per 100g: {selectedProduct.kcalPer100} kcal, P:{selectedProduct.proteinPer100}g, F:{selectedProduct.fatPer100}g, C:{selectedProduct.carbsPer100}g
           </div>
         )}
 
-        <button
-          type="submit"
-          className="w-full py-2.5 bg-emerald-500 text-white rounded-lg font-medium hover:bg-emerald-600 transition-colors"
-        >
+        <button type="submit" className="px-btn">
           {editItem ? 'Save Changes' : 'Add to Inventory'}
         </button>
       </form>

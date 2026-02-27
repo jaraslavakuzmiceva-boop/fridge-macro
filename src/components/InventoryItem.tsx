@@ -15,40 +15,30 @@ export function InventoryItemRow({ item, product, onEdit, onRemove }: Props) {
   const [confirming, setConfirming] = useState(false);
 
   return (
-    <div className="flex items-center justify-between p-3 bg-black rounded-lg border border-emerald-900/40 shadow-[0_0_0_1px_rgba(16,185,129,0.08)]">
+    <div className="px-card flex items-center justify-between p-3">
       <div className="flex-1 min-w-0">
         <div className="flex items-center gap-2">
-          <span className="text-sm font-medium text-white truncate">
+          <span className="text-sm font-medium text-gray-800 truncate">
             {product?.name ?? 'Unknown'}
           </span>
           <ExpirationBadge status={status} />
         </div>
-        <div className="text-sm text-emerald-400 mt-0.5">
-          {item.quantity} {item.unit} &middot; {item.storageLocation}
+        <div className="text-sm text-gray-600 mt-0.5">
+          {item.quantity} {item.unit} · {item.storageLocation}
         </div>
       </div>
       <div className="flex gap-1 ml-2 items-center">
         {confirming ? (
           <div className="flex items-center gap-2">
-            <span className="text-xs text-emerald-400">Remove?</span>
-            <button
-              onClick={() => onRemove(item.id!)}
-              className="text-xs font-semibold text-emerald-300 hover:text-emerald-200"
-            >
-              Yes
-            </button>
-            <button
-              onClick={() => setConfirming(false)}
-              className="text-xs text-emerald-400 hover:text-emerald-200"
-            >
-              No
-            </button>
+            <span className="px-label">Remove?</span>
+            <button onClick={() => onRemove(item.id!)} className="px-btn-text danger">Yes</button>
+            <button onClick={() => setConfirming(false)} className="px-btn-text">No</button>
           </div>
         ) : (
           <>
             <button
               onClick={() => onEdit(item)}
-              className="p-1.5 text-emerald-400 hover:text-emerald-300 transition-colors"
+              className="px-btn-text"
               aria-label="Edit"
             >
               <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -57,7 +47,7 @@ export function InventoryItemRow({ item, product, onEdit, onRemove }: Props) {
             </button>
             <button
               onClick={() => setConfirming(true)}
-              className="p-1.5 text-emerald-400 hover:text-emerald-300 transition-colors"
+              className="px-btn-text danger"
               aria-label="Remove"
             >
               <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">

@@ -437,30 +437,30 @@ export function AddManualMealModal({ products, onLog, onClose }: Props) {
   const [showSpeech, setShowSpeech] = useState(false);
 
   return (
-    <div className="fixed inset-0 bg-black/50 z-50 flex items-end sm:items-center justify-center">
-      <div className="bg-black w-full sm:max-w-lg rounded-t-2xl sm:rounded-2xl p-5 max-h-[90vh] flex flex-col border border-emerald-500 shadow-[0_0_0_1px_rgba(16,185,129,0.35)]">
+    <div className="fixed inset-0 bg-black/70 z-50 flex items-end sm:items-center justify-center">
+      <div className="px-card w-full sm:max-w-lg p-5 max-h-[90vh] flex flex-col">
         {/* Header */}
         <div className="flex justify-between items-center mb-4">
-          <h2 className="text-lg font-bold text-white">Add Meal Manually</h2>
-          <button onClick={onClose} className="text-emerald-400 hover:text-emerald-300 text-xl leading-none">✕</button>
+          <h2>Add Meal Manually</h2>
+          <button onClick={onClose} className="px-btn-text text-xl leading-none">&times;</button>
         </div>
 
         <div className="flex-1 overflow-y-auto space-y-4">
           {/* Totals */}
           {entries.length > 0 && (
-            <div className="bg-black rounded-xl p-4">
-              <p className="text-xs font-semibold text-emerald-300 uppercase tracking-wide mb-2">Meal Total</p>
+            <div className="px-card p-4">
+              <p className="px-label mb-2">Meal Total</p>
               <div className="grid grid-cols-4 gap-2 text-center">
                 {[
                   { label: 'Calories', value: `${totals.kcal}`, unit: 'kcal' },
-                  { label: 'Protein', value: `${totals.protein}`, unit: 'g' },
-                  { label: 'Fat', value: `${totals.fat}`, unit: 'g' },
-                  { label: 'Carbs', value: `${totals.carbs}`, unit: 'g' },
+                  { label: 'Protein',  value: `${totals.protein}`, unit: 'g' },
+                  { label: 'Fat',      value: `${totals.fat}`, unit: 'g' },
+                  { label: 'Carbs',    value: `${totals.carbs}`, unit: 'g' },
                 ].map(({ label, value, unit: u }) => (
-                  <div key={label} className="bg-black rounded-lg p-2 border border-emerald-900/40">
-                    <p className="text-xs text-emerald-300">{label}</p>
-                    <p className="text-sm font-bold text-white">{value}</p>
-                    <p className="text-xs text-emerald-400">{u}</p>
+                  <div key={label} className="px-card p-2">
+                    <p className="px-label">{label}</p>
+                    <p className="text-sm font-bold text-gray-800 mt-1">{value}</p>
+                    <p className="px-label mt-0.5">{u}</p>
                   </div>
                 ))}
               </div>
@@ -470,26 +470,23 @@ export function AddManualMealModal({ products, onLog, onClose }: Props) {
           {/* Added items */}
           {entries.length > 0 && (
             <div className="space-y-2">
-              <p className="text-xs font-semibold text-emerald-300 uppercase tracking-wide">Items</p>
+              <p className="px-label">Items</p>
               {entries.map((e, idx) => {
                 const p = products.get(e.productId);
                 const qty = parseFloat(e.quantity);
                 const m = p && !isNaN(qty) ? calcItemMacros({ productId: e.productId, quantity: qty, unit: e.unit }, p) : null;
                 return (
-                  <div key={idx} className="flex items-start justify-between bg-black rounded-lg p-3">
+                  <div key={idx} className="px-card flex items-start justify-between p-3">
                     <div className="flex-1 min-w-0">
-                      <p className="text-sm font-medium text-white truncate">{p?.name ?? 'Unknown'}</p>
-                      <p className="text-xs text-emerald-300">{e.quantity} {e.unit}</p>
+                      <p className="text-sm font-medium text-gray-800 truncate">{p?.name ?? 'Unknown'}</p>
+                      <p className="px-label mt-0.5">{e.quantity} {e.unit}</p>
                       {m && (
-                        <p className="text-xs text-emerald-400 mt-0.5">
+                        <p className="px-label mt-0.5">
                           {m.kcal} kcal · P {m.protein}g · F {m.fat}g · C {m.carbs}g
                         </p>
                       )}
                     </div>
-                    <button
-                      onClick={() => handleRemoveEntry(idx)}
-                      className="ml-2 text-emerald-400 hover:text-emerald-200 text-xs shrink-0 pt-0.5"
-                    >
+                    <button onClick={() => handleRemoveEntry(idx)} className="px-btn-text danger ml-2 shrink-0">
                       Remove
                     </button>
                   </div>
@@ -499,9 +496,8 @@ export function AddManualMealModal({ products, onLog, onClose }: Props) {
           )}
 
           {/* Add product row */}
-          <div className="bg-black rounded-xl p-4 space-y-3">
-
-            {/* 1. Speech to text */}
+          <div className="space-y-3">
+            {/* 1. Voice input */}
             <button
               type="button"
               onClick={() => {
@@ -513,65 +509,56 @@ export function AddManualMealModal({ products, onLog, onClose }: Props) {
                   setShowSpeech(false);
                 }
               }}
-              className={`w-full flex items-center justify-center gap-2 px-3 py-2 rounded-lg text-sm font-semibold transition-colors ${
-                showSpeech
-                  ? 'bg-emerald-600 text-white'
-                  : 'bg-black border border-emerald-900/40 text-emerald-300 hover:bg-black'
-              }`}
+              className={showSpeech ? 'px-btn' : 'px-btn-outline'}
             >
-              <span className="text-base">🎤</span>
-              {isListening ? 'Stop recording' : 'Voice input'}
+              🎤 {isListening ? 'Stop Recording' : 'Voice Input'}
             </button>
 
             {showSpeech && (
               <div className="space-y-2">
-                <div className="flex rounded-lg border border-emerald-900/40 overflow-hidden self-start">
+                <div className="flex gap-2">
                   <button
                     type="button"
                     onClick={() => setSpeechLang('ru-RU')}
-                    className={`px-2 py-2 text-xs font-semibold ${
-                      speechLang === 'ru-RU' ? 'bg-emerald-600 text-white' : 'bg-black text-emerald-300'
-                    }`}
+                    className={`px-tab${speechLang === 'ru-RU' ? ' active' : ''}`}
                   >
                     RU
                   </button>
                   <button
                     type="button"
                     onClick={() => setSpeechLang('en-US')}
-                    className={`px-2 py-2 text-xs font-semibold ${
-                      speechLang === 'en-US' ? 'bg-emerald-600 text-white' : 'bg-black text-emerald-300'
-                    }`}
+                    className={`px-tab${speechLang === 'en-US' ? ' active' : ''}`}
                   >
                     EN
                   </button>
                 </div>
                 {speechError && (
-                  <p className="text-xs text-rose-400">{speechError}</p>
+                  <p className="px-label neon-red">{speechError}</p>
                 )}
                 <textarea
-                  placeholder="Speech transcript will appear here. You can edit before adding."
+                  placeholder="Speech transcript will appear here..."
                   value={transcript}
                   onChange={e => setTranscript(e.target.value)}
-                  className="w-full border border-emerald-900/40 rounded-lg px-3 py-2 text-sm bg-black focus:outline-none focus:ring-2 focus:ring-emerald-400"
+                  className="px-input"
                   rows={2}
                 />
                 <button
                   type="button"
                   onClick={handleSpeechAdd}
                   disabled={!transcript.trim()}
-                  className="w-full py-2 bg-emerald-500 disabled:bg-black disabled:text-emerald-400 text-black rounded-lg text-sm font-semibold hover:bg-emerald-400 transition-colors"
+                  className="px-btn"
                 >
                   Add Items From Speech
                 </button>
               </div>
             )}
 
-            {/* 2. Product search */}
-            <p className="text-xs font-semibold text-emerald-300 uppercase tracking-wide">Add manually</p>
+            {/* 2. Manual search */}
+            <p className="px-label">Add Manually</p>
             <div className="relative">
               <input
                 type="text"
-                placeholder="Search product…"
+                placeholder="Search product..."
                 value={search}
                 onChange={e => {
                   setSearch(e.target.value);
@@ -579,10 +566,10 @@ export function AddManualMealModal({ products, onLog, onClose }: Props) {
                   setShowDropdown(true);
                 }}
                 onFocus={() => setShowDropdown(true)}
-                className="w-full border border-emerald-900/40 rounded-lg px-3 py-2 text-sm bg-black focus:outline-none focus:ring-2 focus:ring-emerald-400"
+                className="px-input"
               />
               {showDropdown && filteredProducts.length > 0 && (
-                <div className="absolute z-10 w-full mt-1 bg-black border border-emerald-900/40 rounded-lg shadow-lg max-h-48 overflow-y-auto">
+                <div className="absolute z-10 w-full mt-1 px-card max-h-48 overflow-y-auto" style={{ top: '100%' }}>
                   {filteredProducts.map(p => (
                     <button
                       key={p.id}
@@ -590,22 +577,23 @@ export function AddManualMealModal({ products, onLog, onClose }: Props) {
                         handleProductSelect(p.id!);
                         setShowDropdown(false);
                       }}
-                      className="w-full text-left px-3 py-2 text-sm hover:bg-black text-emerald-200"
+                      className="w-full text-left px-3 py-2 text-sm text-gray-800 hover:bg-gray-100"
+                      style={{ display: 'block' }}
                     >
-                      <span className="font-medium">{p.name}</span>
-                      <span className="ml-1 text-emerald-400 text-xs">({p.kcalPer100} kcal/100{p.defaultUnit === 'pieces' ? 'pc' : p.defaultUnit})</span>
+                      {p.name}
+                      <span className="ml-1 px-label">({p.kcalPer100} kcal/100{p.defaultUnit === 'pieces' ? 'pc' : p.defaultUnit})</span>
                     </button>
                   ))}
                 </div>
               )}
             </div>
 
-            {/* Quantity + unit (collapsed by default) */}
+            {/* Quantity + unit */}
             {!showManualRow ? (
               <button
                 type="button"
                 onClick={() => setShowManualRow(true)}
-                className="w-full py-2 border border-dashed border-emerald-300 text-emerald-300 rounded-lg text-sm font-semibold hover:bg-black transition-colors"
+                className="px-btn-outline"
               >
                 Add +
               </button>
@@ -619,13 +607,15 @@ export function AddManualMealModal({ products, onLog, onClose }: Props) {
                     placeholder="Amount"
                     value={quantity}
                     onChange={e => setQuantity(e.target.value)}
-                    className="flex-1 border border-emerald-900/40 rounded-lg px-3 py-2 text-sm bg-black focus:outline-none focus:ring-2 focus:ring-emerald-400"
+                    className="px-input flex-1"
+                    style={{ width: 'auto' }}
                     autoFocus
                   />
                   <select
                     value={unit}
                     onChange={e => setUnit(e.target.value as 'g' | 'ml' | 'pieces')}
-                    className="border border-emerald-900/40 rounded-lg px-3 py-2 text-sm bg-black focus:outline-none focus:ring-2 focus:ring-emerald-400"
+                    className="px-input"
+                    style={{ width: 'auto' }}
                   >
                     <option value="g">g</option>
                     <option value="ml">ml</option>
@@ -634,39 +624,27 @@ export function AddManualMealModal({ products, onLog, onClose }: Props) {
                 </div>
 
                 {rowPreview && (
-                  <p className="text-xs text-emerald-300 bg-black rounded-lg px-3 py-2">
-                    {rowPreview.kcal} kcal · Protein {rowPreview.protein}g · Fat {rowPreview.fat}g · Carbs {rowPreview.carbs}g
+                  <p className="px-label neon-green">
+                    {rowPreview.kcal} kcal · P {rowPreview.protein}g · F {rowPreview.fat}g · C {rowPreview.carbs}g
                   </p>
                 )}
 
                 <button
                   onClick={handleAddEntry}
                   disabled={selectedProductId === '' || !quantity || parseFloat(quantity) <= 0}
-                  className="w-full py-2 bg-emerald-500 disabled:bg-black disabled:text-emerald-400 text-black rounded-lg text-sm font-semibold hover:bg-emerald-400 transition-colors"
+                  className="px-btn"
                 >
                   + Add to Meal
                 </button>
               </>
             )}
           </div>
-
         </div>
 
         {/* Footer */}
-        <div className="mt-4 flex gap-2">
-          <button
-            onClick={onClose}
-            className="flex-1 py-3 rounded-xl border border-emerald-900/40 text-emerald-300 text-sm font-semibold hover:bg-black transition-colors"
-          >
-            Cancel
-          </button>
-          <button
-            onClick={handleLog}
-            disabled={entries.length === 0}
-            className="flex-1 py-3 rounded-xl bg-emerald-500 text-black text-sm font-semibold hover:bg-emerald-400 transition-colors shadow-sm disabled:opacity-50"
-          >
-            Log Meal
-          </button>
+        <div className="mt-4 flex gap-3">
+          <button onClick={onClose}    className="px-btn-outline flex-1">Cancel</button>
+          <button onClick={handleLog} disabled={entries.length === 0} className="px-btn flex-1">Log Meal</button>
         </div>
       </div>
     </div>
