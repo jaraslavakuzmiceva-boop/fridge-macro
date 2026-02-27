@@ -9,6 +9,8 @@ export default defineConfig({
     react(),
     tailwindcss(),
     VitePWA({
+      // Force old SW clients to unregister and drop stale cached assets.
+      selfDestroying: true,
       registerType: 'autoUpdate',
       includeAssets: ['icons/*.png'],
       manifest: {
